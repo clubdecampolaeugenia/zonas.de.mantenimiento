@@ -26,14 +26,16 @@
   .legend{display:flex; gap:8px; margin:12px 14px 0;}
   .legend button{
     flex:1; border:1px solid rgba(255,255,255,.5); border-radius:14px; padding:10px 6px;
-    background:rgba(255,255,255,.16); color:var(--hueso); font-size:11.5px; font-weight:700;
-    display:flex; flex-direction:column; align-items:center; gap:5px; cursor:pointer;
-    box-shadow:inset 0 1px 1px rgba(255,255,255,.25); transition:background .2s ease, transform .15s ease;
+    color:var(--petroleo); font-size:11.5px; font-weight:700;
+    display:flex; flex-direction:column; align-items:center; gap:3px; cursor:pointer;
+    box-shadow:0 3px 8px rgba(0,0,0,.2); transition:transform .15s ease, box-shadow .2s ease;
   }
   .legend button:active{ transform:scale(.96); }
-  .legend button.active{ background:rgba(255,255,255,.94); color:var(--petroleo); }
-  .legend button .sw{ width:20px; height:20px; border-radius:6px; }
-  .legend button .letras{ font-weight:400; font-size:10px; opacity:.85; }
+  .legend button.active{ box-shadow:0 0 0 2px var(--hueso), 0 3px 8px rgba(0,0,0,.3); }
+  .legend button.lz1{ background:var(--zona1); }
+  .legend button.lz2{ background:var(--zona2); }
+  .legend button.lz3{ background:var(--zona3); }
+  .legend button .letras{ font-weight:400; font-size:10px; opacity:.8; }
 
   .search-wrap{ margin:12px 14px 0; }
   .search-box{display:flex; align-items:center; gap:8px; background:rgba(255,255,255,.4); border:1px solid rgba(255,255,255,.5); border-radius:16px; padding:11px 16px; box-shadow:0 4px 14px rgba(0,0,0,.25), inset 0 1px 1px rgba(255,255,255,.6); transition:background .25s ease, transform .25s cubic-bezier(.34,1.56,.64,1);}
@@ -55,7 +57,7 @@
   #mapHost{ margin:14px 10px 0; border-radius:16px; overflow:hidden; background:#0f3f42; box-shadow:0 6px 18px rgba(0,0,0,.3); }
   #mapHost svg{ width:100%; height:auto; display:block; }
   #realSvg #CALLES{ display:none; }
-  #realSvg #CALLES.show{ display:inline; }
+  .street-label{ fill:#ffffff; font-family:'Roboto',Arial,sans-serif; text-anchor:middle; pointer-events:none; }
 
   .map-controls{display:flex; gap:8px; margin:10px 14px 0;}
   .map-controls button{
@@ -72,17 +74,27 @@
   #Mantenimiento_ZONA_2.destello-real2 *{ animation:pulseZona2 2.2s cubic-bezier(.45,0,.55,1) infinite; }
   #Mantenimiento_ZONA_3_1_.destello-real3 *{ animation:pulseZona3 2.2s cubic-bezier(.45,0,.55,1) infinite; }
 
+  /* estado solido de reposo: la zona queda pintada, sin animar */
+  #Mantenimiento_ZONA_1.solida1 *{ fill:var(--zona1) !important; }
+  #Mantenimiento_ZONA_2.solida2 *{ fill:var(--zona2) !important; }
+  #Mantenimiento_ZONA_3_1_.solida3 *{ fill:var(--zona3) !important; }
+
   .lote-seleccionado{ animation:none !important; fill-opacity:1 !important; }
   .lote-seleccionado.lz1{ fill:var(--zona1) !important; }
   .lote-seleccionado.lz2{ fill:var(--zona2) !important; }
   .lote-seleccionado.lz3{ fill:var(--zona3) !important; }
 
   .sheet{
-    margin:14px 14px 0; background:rgba(245,243,236,.97); border-radius:18px; padding:14px 16px;
-    box-shadow:0 6px 18px rgba(0,0,0,.25);
-    max-height:0; opacity:0; overflow:hidden; transition:max-height .3s ease, opacity .25s ease, margin .3s ease;
+    position:fixed; left:0; right:0; bottom:0; z-index:80;
+    background:rgba(245,243,236,.97); color:var(--petroleo); border-radius:20px 20px 0 0;
+    padding:14px 18px calc(16px + env(safe-area-inset-bottom));
+    box-shadow:0 -6px 20px rgba(0,0,0,.35); backdrop-filter:blur(6px);
+    max-height:70vh; overflow-y:auto;
+    transform:translateY(100%); opacity:0; pointer-events:none;
+    transition:transform .32s cubic-bezier(.22,.9,.3,1), opacity .28s ease;
   }
-  .sheet.show{ max-height:420px; opacity:1; overflow-y:auto; margin-bottom:16px; }
+  .sheet.show{ transform:translateY(0); opacity:1; pointer-events:auto; }
+  .sheet .handle{width:38px; height:4px; background:rgba(19,84,87,.25); border-radius:4px; margin:0 auto 12px;}
   .sheet .head{display:flex; align-items:center; gap:10px; margin-bottom:6px;}
   .sheet .head .swatch{width:14px; height:14px; border-radius:4px; flex-shrink:0;}
   .sheet .head h3{margin:0; font-size:14.5px; color:var(--petroleo); flex:1;}
@@ -110,9 +122,9 @@
 </header>
 
 <div class="legend">
-  <button class="lz1" data-zona="1"><span class="sw" style="background:var(--zona1)"></span><span>Zona 1</span><span class="letras">A · B · C · D · E</span></button>
-  <button class="lz2" data-zona="2"><span class="sw" style="background:var(--zona2)"></span><span>Zona 2</span><span class="letras">G a R</span></button>
-  <button class="lz3" data-zona="3"><span class="sw" style="background:var(--zona3)"></span><span>Zona 3</span><span class="letras">S · T · U · V · W</span></button>
+  <button class="lz1" data-zona="1"><span>Zona 1</span><span class="letras">A · B · C · D · E</span></button>
+  <button class="lz2" data-zona="2"><span>Zona 2</span><span class="letras">G a R</span></button>
+  <button class="lz3" data-zona="3"><span>Zona 3</span><span class="letras">S · T · U · V · W</span></button>
 </div>
 
 <div class="search-wrap">
@@ -124,6 +136,7 @@
 </div>
 
 <div id="sheet" class="sheet">
+  <div class="handle"></div>
   <div class="head"><span id="sheetSwatch" class="swatch"></span><h3 id="sheetTitulo">Zona</h3><button id="sheetClose">Cerrar</button></div>
   <div id="sheetBody"></div>
 </div>
@@ -34038,11 +34051,14 @@ const GRAFOS_TRACTOR = {"ZONA_1":{"nodos":[[37.8,213.7],[37.9,204.5],[38.1,195.2
     if(on) t.iniciar(); else t.detener();
   }
 
+const ZONA_SOLIDA = {1:'solida1', 2:'solida2', 3:'solida3'};
+
 function apagarZonas(){
+  // vuelve las 3 zonas a su estado solido de reposo (no las apaga del todo)
   if(bienvenidaTimeout){ clearTimeout(bienvenidaTimeout); bienvenidaTimeout = null; }
   [1,2,3].forEach(z=>{
     const g = document.getElementById(ZONA_GROUP_REAL_ID[z]);
-    if(g) g.classList.remove(ZONA_CLASE[z]);
+    if(g){ g.classList.remove(ZONA_CLASE[z]); g.classList.add(ZONA_SOLIDA[z]); }
     mostrarTractor(ZONA_GROUP_REAL_ID[z], false);
   });
   document.querySelectorAll('.legend button').forEach(b=>b.classList.remove('active'));
@@ -34078,7 +34094,7 @@ function mostrarSheetZona(zona, loteId){
 function pulsarZona(zona, updateUrl){
   apagarZonas();
   const g = document.getElementById(ZONA_GROUP_REAL_ID[zona]);
-  if(g) g.classList.add(ZONA_CLASE[zona]);
+  if(g){ g.classList.remove(ZONA_SOLIDA[zona]); g.classList.add(ZONA_CLASE[zona]); }
   mostrarTractor(ZONA_GROUP_REAL_ID[zona], true);
   document.querySelector('.legend button[data-zona="'+zona+'"]').classList.add('active');
   mostrarSheetZona(zona, null);
@@ -34114,7 +34130,7 @@ function irALote(id, updateUrl){
   // lotes de esa zona siguen pulsando mientras el buscado queda solido
   apagarZonas();
   const g = document.getElementById(ZONA_GROUP_REAL_ID[info.zona]);
-  if(g) g.classList.add(ZONA_CLASE[info.zona]);
+  if(g){ g.classList.remove(ZONA_SOLIDA[info.zona]); g.classList.add(ZONA_CLASE[info.zona]); }
   mostrarTractor(ZONA_GROUP_REAL_ID[info.zona], true);
   const el = document.getElementById(info.domId);
   if(el){
@@ -34184,20 +34200,43 @@ function pulsoBienvenida(){
   });
   bienvenidaTimeout = setTimeout(()=>{
     bienvenidaTimeout = null;
+    // las 3 zonas quedan solidas (no vuelven a verde)
     [1,2,3].forEach(z=>{
       const g = document.getElementById(ZONA_GROUP_REAL_ID[z]);
-      if(g) g.classList.remove(ZONA_CLASE[z]);
+      if(g){ g.classList.remove(ZONA_CLASE[z]); g.classList.add(ZONA_SOLIDA[z]); }
     });
   }, 2000);
 }
 pulsoBienvenida();
 
+const STREET_LABELS = {"CALLE_URUTAU":[{"x":229.55,"y":168.65,"angle":78.8}],"CALLE_ZORZAL":[{"x":168.04,"y":187.66,"angle":78.3}],"CALLE_JILGUERO":[{"x":292.25,"y":154.55,"angle":79.6}],"CALLE_PICAFLOR":[{"x":419.32,"y":119.26,"angle":88.8}],"CALLE_TORDO":[{"x":121.44,"y":262.24,"angle":79.0}],"CALLE_PALO_ROSA":[{"x":242.66,"y":152.88,"angle":-10.3}],"CALLE_GOLONDRINA":[{"x":38.64,"y":163.74,"angle":-89.0}],"CALLE_LECHUZA":[{"x":382.48,"y":193.66,"angle":88.7}],"CALLE_OMBU":[{"x":376.77,"y":163.38,"angle":-1.2}],"CALLE_LA_EUGENIA":[{"x":335.44,"y":120.77,"angle":88.8},{"x":350.06,"y":227.08,"angle":79.2}],"CALLE_ARAUCARIA":[{"x":483.78,"y":148.28,"angle":-65.2},{"x":425.17,"y":214.38,"angle":-9.1}],"CALLE_EUCALIPTUS":[{"x":190.08,"y":223.98,"angle":-10.2}],"CALLE_PINDO":[{"x":115.92,"y":120.16,"angle":-13.9},{"x":245.29,"y":88.1,"angle":-13.9},{"x":470.28,"y":42.64,"angle":17.4}],"CALLE_LAS_ACACIAS":[{"x":123.17,"y":290.0,"angle":-10.9},{"x":288.79,"y":258.7,"angle":-8.8},{"x":436.94,"y":236.18,"angle":-8.4}],"CALLE_LAPACHO":[{"x":454.08,"y":135.15,"angle":23.2}],"CALLE_PARAISO":[{"x":449.93,"y":83.31,"angle":17.4}]};
 const btnVerCalles = document.getElementById('btnVerCalles');
-const callesGroup = document.getElementById('CALLES');
+let streetLabelsGroup = null;
 btnVerCalles.addEventListener('click', ()=>{
-  const on = !callesGroup.classList.contains('show');
-  callesGroup.classList.toggle('show', on);
+  const on = !btnVerCalles.classList.contains('active');
   btnVerCalles.classList.toggle('active', on);
+  if(on){
+    if(!streetLabelsGroup){
+      streetLabelsGroup = document.createElementNS('http://www.w3.org/2000/svg','g');
+      streetLabelsGroup.setAttribute('id','StreetLabels');
+      Object.entries(STREET_LABELS).forEach(([name, positions])=>{
+        positions.forEach(pos=>{
+          const t = document.createElementNS('http://www.w3.org/2000/svg','text');
+          t.setAttribute('class','street-label');
+          t.setAttribute('x', pos.x);
+          t.setAttribute('y', pos.y);
+          t.setAttribute('font-size', '2.6');
+          t.setAttribute('transform', 'rotate('+pos.angle+' '+pos.x+' '+pos.y+')');
+          t.textContent = name.replace('CALLE_','').replace(/_/g,' ');
+          streetLabelsGroup.appendChild(t);
+        });
+      });
+      document.getElementById('realSvg').appendChild(streetLabelsGroup);
+    }
+    streetLabelsGroup.style.display = 'inline';
+  } else if(streetLabelsGroup){
+    streetLabelsGroup.style.display = 'none';
+  }
 });
 
 (function(){
