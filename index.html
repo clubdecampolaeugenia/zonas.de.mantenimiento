@@ -33991,7 +33991,11 @@ function irALote(id, updateUrl){
   const info = LOTES[id];
   if(!info) return;
   limpiarLoteSeleccionado();
+  // activa el pulso de la zona del lote (no lo apaga), asi el resto de los
+  // lotes de esa zona siguen pulsando mientras el buscado queda solido
   apagarZonas();
+  const g = document.getElementById(ZONA_GROUP_REAL_ID[info.zona]);
+  if(g) g.classList.add(ZONA_CLASE[info.zona]);
   const el = document.getElementById(info.domId);
   if(el){
     el.classList.add('lote-seleccionado', 'lz'+info.zona);
