@@ -28,10 +28,11 @@
     flex:1; border:1px solid rgba(255,255,255,.5); border-radius:14px; padding:10px 6px;
     color:var(--petroleo); font-size:11.5px; font-weight:700;
     display:flex; flex-direction:column; align-items:center; gap:3px; cursor:pointer;
-    box-shadow:0 3px 8px rgba(0,0,0,.2); transition:transform .15s ease, box-shadow .2s ease;
+    box-shadow:0 4px 14px rgba(0,0,0,.25), inset 0 1px 1px rgba(255,255,255,.6);
+    transition:transform .18s cubic-bezier(.34,1.56,.64,1), box-shadow .2s ease;
   }
   .legend button:active{ transform:scale(.96); }
-  .legend button.active{ box-shadow:0 0 0 2px var(--hueso), 0 3px 8px rgba(0,0,0,.3); }
+  .legend button.active{ transform:translateY(-3px); box-shadow:0 8px 18px rgba(0,0,0,.35), inset 0 1px 1px rgba(255,255,255,.6); }
   .legend button.lz1{ background:var(--zona1); }
   .legend button.lz2{ background:var(--zona2); }
   .legend button.lz3{ background:var(--zona3); }
@@ -122,9 +123,9 @@
 </header>
 
 <div class="legend">
-  <button class="lz1" data-zona="1"><span>Zona 1</span><span class="letras">A · B · C · D · E</span></button>
-  <button class="lz2" data-zona="2"><span>Zona 2</span><span class="letras">G a R</span></button>
   <button class="lz3" data-zona="3"><span>Zona 3</span><span class="letras">S · T · U · V · W</span></button>
+  <button class="lz2" data-zona="2"><span>Zona 2</span><span class="letras">G a R</span></button>
+  <button class="lz1" data-zona="1"><span>Zona 1</span><span class="letras">A · B · C · D · E</span></button>
 </div>
 
 <div class="search-wrap">
@@ -34053,8 +34054,20 @@ const GRAFOS_TRACTOR = {"ZONA_1":{"nodos":[[37.8,213.7],[37.9,204.5],[38.1,195.2
 
 const ZONA_SOLIDA = {1:'solida1', 2:'solida2', 3:'solida3'};
 
+// Vuelve las 3 zonas a color base (verde), sin solido ni pulso.
+// Se usa antes de resaltar una zona puntual: las otras dos pierden color.
 function apagarZonas(){
-  // vuelve las 3 zonas a su estado solido de reposo (no las apaga del todo)
+  if(bienvenidaTimeout){ clearTimeout(bienvenidaTimeout); bienvenidaTimeout = null; }
+  [1,2,3].forEach(z=>{
+    const g = document.getElementById(ZONA_GROUP_REAL_ID[z]);
+    if(g){ g.classList.remove(ZONA_CLASE[z]); g.classList.remove(ZONA_SOLIDA[z]); }
+    mostrarTractor(ZONA_GROUP_REAL_ID[z], false);
+  });
+  document.querySelectorAll('.legend button').forEach(b=>b.classList.remove('active'));
+}
+
+// Vuelve las 3 zonas al estado solido de reposo (se usa al cerrar el card).
+function volverASolido(){
   if(bienvenidaTimeout){ clearTimeout(bienvenidaTimeout); bienvenidaTimeout = null; }
   [1,2,3].forEach(z=>{
     const g = document.getElementById(ZONA_GROUP_REAL_ID[z]);
@@ -34108,7 +34121,7 @@ function pulsarZona(zona, updateUrl){
 
 document.getElementById('sheetClose').addEventListener('click', ()=>{
   document.getElementById('sheet').classList.remove('show');
-  apagarZonas();
+  volverASolido();
   limpiarLoteSeleccionado();
   const url = new URL(location.href);
   url.searchParams.delete('zona'); url.searchParams.delete('lote');
@@ -34205,7 +34218,7 @@ function pulsoBienvenida(){
       const g = document.getElementById(ZONA_GROUP_REAL_ID[z]);
       if(g){ g.classList.remove(ZONA_CLASE[z]); g.classList.add(ZONA_SOLIDA[z]); }
     });
-  }, 2000);
+  }, 3800);
 }
 pulsoBienvenida();
 
