@@ -25,9 +25,9 @@
 
   .legend{display:flex; gap:8px; margin:12px 14px 0;}
   .legend button{
-    flex:1; border:1px solid rgba(255,255,255,.5); border-radius:14px; padding:10px 6px;
-    color:var(--petroleo); font-size:11.5px; font-weight:700;
-    display:flex; flex-direction:column; align-items:center; gap:3px; cursor:pointer;
+    flex:1; border:1px solid rgba(255,255,255,.5); border-radius:14px; padding:12px 6px;
+    color:var(--petroleo); font-size:12.5px; font-weight:700;
+    display:flex; align-items:center; justify-content:center; cursor:pointer;
     box-shadow:0 4px 14px rgba(0,0,0,.25), inset 0 1px 1px rgba(255,255,255,.6);
     transition:transform .18s cubic-bezier(.34,1.56,.64,1), box-shadow .2s ease;
   }
@@ -123,9 +123,9 @@
 </header>
 
 <div class="legend">
-  <button class="lz3" data-zona="3"><span>Zona 3</span><span class="letras">S · T · U · V · W</span></button>
-  <button class="lz2" data-zona="2"><span>Zona 2</span><span class="letras">G a R</span></button>
-  <button class="lz1" data-zona="1"><span>Zona 1</span><span class="letras">A · B · C · D · E</span></button>
+  <button class="lz3" data-zona="3"><span>Zona 3</span></button>
+  <button class="lz2" data-zona="2"><span>Zona 2</span></button>
+  <button class="lz1" data-zona="1"><span>Zona 1</span></button>
 </div>
 
 <div class="search-wrap">
@@ -34162,6 +34162,26 @@ function irALote(id, updateUrl){
     history.replaceState(null,'',url);
   }
 }
+
+// Tocar el card levantado lo cierra
+document.getElementById('sheet').addEventListener('click', ()=>{
+  document.getElementById('sheetClose').click();
+});
+
+// Tocar fuera del card (y fuera de lo que ya abre su propio card) tambien lo cierra
+document.addEventListener('click', (e)=>{
+  const sheet = document.getElementById('sheet');
+  if(!sheet.classList.contains('show')) return;
+  const esControlPropio = e.target.closest('#sheet, .legend button, #btnPodasGrandes, .suggestion-item, #searchInput');
+  if(esControlPropio) return;
+  document.getElementById('sheetClose').click();
+});
+
+// Activar el buscador cierra cualquier card abierto
+document.getElementById('searchInput').addEventListener('focus', ()=>{
+  const sheet = document.getElementById('sheet');
+  if(sheet.classList.contains('show')) document.getElementById('sheetClose').click();
+});
 
 const input = document.getElementById('searchInput');
 const sugBox = document.getElementById('suggestions');
