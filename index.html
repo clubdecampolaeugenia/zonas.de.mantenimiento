@@ -33920,6 +33920,7 @@ AAAAAAAAAAAAAAAAAAAAAAAAgEj/BEfDIS5Jha1kAAAAAElFTkSuQmCC" transform="matrix(6.86
 
 <div class="map-controls">
   <button id="btnVerCalles">Ver calles</button>
+  <button id="btnPodasGrandes">Podas grandes</button>
 </div>
 
 <div class="cta-row">
@@ -34038,6 +34039,7 @@ const GRAFOS_TRACTOR = {"ZONA_1":{"nodos":[[37.8,213.7],[37.9,204.5],[38.1,195.2
   }
 
 function apagarZonas(){
+  if(bienvenidaTimeout){ clearTimeout(bienvenidaTimeout); bienvenidaTimeout = null; }
   [1,2,3].forEach(z=>{
     const g = document.getElementById(ZONA_GROUP_REAL_ID[z]);
     if(g) g.classList.remove(ZONA_CLASE[z]);
@@ -34054,24 +34056,22 @@ function limpiarLoteSeleccionado(){
   }
 }
 
-const infoZonaHTML = (zona) => `
+const infoZonaHTML = () => `
   <ul>
     <li>Levantamiento de podas y ponchadas por rondas rotativas — se avisa por WhatsApp en <i>La Euge Informa</i>.</li>
     <li>Corte de césped en espacios comunes y banquinas del sector.</li>
     <li>Ponchadas en venta en garita; agilizan el retiro si están colocadas en ellas.</li>
     <li>Podas que superen un cachapé se coordinan de forma particular.</li>
   </ul>
-  <div class="contactos">
-    <a class="contacto-btn" href="https://wa.me/5493765121797" target="_blank" rel="noopener"><span>Sr. Félix</span><span class="ir">WhatsApp</span></a>
-    <a class="contacto-btn" href="https://wa.me/5493764726485" target="_blank" rel="noopener"><span>Sr. Patiño</span><span class="ir">WhatsApp</span></a>
-    <a class="contacto-btn" href="https://wa.me/5493764889851" target="_blank" rel="noopener"><span>Sr. Aquino</span><span class="ir">WhatsApp</span></a>
-  </div>
 `;
 
-function mostrarSheetZona(zona){
-  document.getElementById('sheetTitulo').textContent = ZONA_NOMBRE[zona] + ' — Lotes ' + ZONA_LETRAS[zona];
+function mostrarSheetZona(zona, loteId){
+  const titulo = loteId
+    ? 'El lote ' + loteId + ' está dentro de la ' + ZONA_NOMBRE[zona]
+    : ZONA_NOMBRE[zona] + ' — Lotes ' + ZONA_LETRAS[zona];
+  document.getElementById('sheetTitulo').textContent = titulo;
   document.getElementById('sheetSwatch').style.background = 'var(--zona'+zona+')';
-  document.getElementById('sheetBody').innerHTML = infoZonaHTML(zona);
+  document.getElementById('sheetBody').innerHTML = infoZonaHTML();
   document.getElementById('sheet').classList.add('show');
 }
 
@@ -34081,7 +34081,7 @@ function pulsarZona(zona, updateUrl){
   if(g) g.classList.add(ZONA_CLASE[zona]);
   mostrarTractor(ZONA_GROUP_REAL_ID[zona], true);
   document.querySelector('.legend button[data-zona="'+zona+'"]').classList.add('active');
-  mostrarSheetZona(zona);
+  mostrarSheetZona(zona, null);
   if(updateUrl){
     const url = new URL(location.href);
     url.searchParams.set('zona', zona);
@@ -34122,7 +34122,7 @@ function irALote(id, updateUrl){
     loteSeleccionadoEl = el;
   }
   document.querySelector('.legend button[data-zona="'+info.zona+'"]').classList.add('active');
-  mostrarSheetZona(info.zona);
+  mostrarSheetZona(info.zona, id);
   document.getElementById('suggestions').classList.remove('open');
   document.getElementById('searchInput').value = id;
   document.getElementById('searchInput').blur();
@@ -34158,6 +34158,39 @@ input.addEventListener('keydown', (e)=>{
     if(LOTES[q]) irALote(q, true);
   }
 });
+
+const contactosPodasHTML = `
+  <div class="contactos">
+    <a class="contacto-btn" href="https://wa.me/5493765121797" target="_blank" rel="noopener"><span>Sr. Félix</span><span class="ir">WhatsApp</span></a>
+    <a class="contacto-btn" href="https://wa.me/5493764726485" target="_blank" rel="noopener"><span>Sr. Patiño</span><span class="ir">WhatsApp</span></a>
+    <a class="contacto-btn" href="https://wa.me/5493764889851" target="_blank" rel="noopener"><span>Sr. Aquino</span><span class="ir">WhatsApp</span></a>
+  </div>
+`;
+document.getElementById('btnPodasGrandes').addEventListener('click', ()=>{
+  limpiarLoteSeleccionado();
+  apagarZonas();
+  document.getElementById('sheetTitulo').textContent = 'Podas grandes — retiro particular';
+  document.getElementById('sheetSwatch').style.background = 'var(--naranja)';
+  document.getElementById('sheetBody').innerHTML = contactosPodasHTML;
+  document.getElementById('sheet').classList.add('show');
+});
+
+// Animacion de bienvenida: las 3 zonas pulsan juntas 2 segundos y se apagan
+let bienvenidaTimeout = null;
+function pulsoBienvenida(){
+  [1,2,3].forEach(z=>{
+    const g = document.getElementById(ZONA_GROUP_REAL_ID[z]);
+    if(g) g.classList.add(ZONA_CLASE[z]);
+  });
+  bienvenidaTimeout = setTimeout(()=>{
+    bienvenidaTimeout = null;
+    [1,2,3].forEach(z=>{
+      const g = document.getElementById(ZONA_GROUP_REAL_ID[z]);
+      if(g) g.classList.remove(ZONA_CLASE[z]);
+    });
+  }, 2000);
+}
+pulsoBienvenida();
 
 const btnVerCalles = document.getElementById('btnVerCalles');
 const callesGroup = document.getElementById('CALLES');
