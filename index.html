@@ -54,6 +54,16 @@
 
   #mapHost{ margin:14px 10px 0; border-radius:16px; overflow:hidden; background:#0f3f42; box-shadow:0 6px 18px rgba(0,0,0,.3); }
   #mapHost svg{ width:100%; height:auto; display:block; }
+  #realSvg #CALLES{ display:none; }
+  #realSvg #CALLES.show{ display:inline; }
+
+  .map-controls{display:flex; gap:8px; margin:10px 14px 0;}
+  .map-controls button{
+    flex:1; border:1px solid rgba(255,255,255,.5); background:rgba(255,255,255,.16); color:var(--hueso);
+    font-size:12.5px; font-weight:700; padding:9px 10px; border-radius:12px; cursor:pointer;
+    transition:background .2s ease;
+  }
+  .map-controls button.active{ background:rgba(255,255,255,.94); color:var(--petroleo); }
 
   @keyframes pulseZona1{ 0%,100%{ fill:#00A650; } 50%{ fill:var(--zona1); } }
   @keyframes pulseZona2{ 0%,100%{ fill:#00A650; } 50%{ fill:var(--zona2); } }
@@ -62,7 +72,7 @@
   #Mantenimiento_ZONA_2.destello-real2 *{ animation:pulseZona2 2.2s cubic-bezier(.45,0,.55,1) infinite; }
   #Mantenimiento_ZONA_3_1_.destello-real3 *{ animation:pulseZona3 2.2s cubic-bezier(.45,0,.55,1) infinite; }
 
-  .lote-seleccionado{ animation:none !important; stroke:#fff !important; stroke-width:1 !important; fill-opacity:1 !important; }
+  .lote-seleccionado{ animation:none !important; fill-opacity:1 !important; }
   .lote-seleccionado.lz1{ fill:var(--zona1) !important; }
   .lote-seleccionado.lz2{ fill:var(--zona2) !important; }
   .lote-seleccionado.lz3{ fill:var(--zona3) !important; }
@@ -121,7 +131,7 @@
 <div id="mapHost">
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Generator: Adobe Illustrator 19.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
-<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+<svg id="realSvg" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 viewBox="0 0 568.9 319.7" enable-background="new 0 0 568.9 319.7" xml:space="preserve">
 <g id="Mantenimiento_ZONA_3_1_">
 	<polygon id="U26_1_" fill-rule="evenodd" clip-rule="evenodd" fill="#00A650" points="119.5,122.5 129.9,119.8 134.1,138.8 
@@ -33908,6 +33918,10 @@ AAAAAAAAAAAAAAAAAAAAAAAAgEj/BEfDIS5Jha1kAAAAAElFTkSuQmCC" transform="matrix(6.86
 
 </div>
 
+<div class="map-controls">
+  <button id="btnVerCalles">Ver calles</button>
+</div>
+
 <div class="cta-row">
   <a class="cta gold" href="https://wa.me/5493764880000" target="_blank" rel="noopener">Contactar a Intendencia</a>
   <a class="cta lima" href="https://clubdecampolaeugenia.taplink.site/" target="_blank" rel="noopener">Centro de Gestión Vecinal</a>
@@ -33920,10 +33934,114 @@ const ZONA_LETRAS = {1:'A · B · C · D · E', 2:'G a R', 3:'S · T · U · V �
 const ZONA_GROUP_REAL_ID = {1:'Mantenimiento_ZONA_1', 2:'Mantenimiento_ZONA_2', 3:'Mantenimiento_ZONA_3_1_'};
 const ZONA_CLASE  = {1:'destello-real1', 2:'destello-real2', 3:'destello-real3'};
 
+const GRAFOS_TRACTOR = {"ZONA_1":{"nodos":[[37.8,213.7],[37.9,204.5],[38.1,195.2],[38.2,185.9],[38.4,176.6],[38.6,167.4],[38.7,158.1],[38.9,148.8],[39.1,139.2],[39.1,139.5],[39.2,130.3],[39.4,121.0],[47.0,137.2],[53.5,135.6],[57.5,134.6],[66.9,132.3],[69.5,131.7],[70.7,263.4],[75.5,130.2],[80.7,128.9],[83.9,128.1],[89.5,252.4],[91.6,126.2],[93.0,125.8],[98.6,247.1],[101.4,123.8],[103.0,123.4],[110.2,121.6],[113.3,120.8],[116.5,236.7],[118.2,119.6],[122.7,235.6],[123.9,118.2],[124.8,235.3],[125.9,117.7],[132.4,234.0],[132.5,234.0],[134.6,115.5],[141.4,232.4],[142.0,232.3],[143.2,113.4],[149.8,231.0],[151.4,230.7],[152.2,111.2],[154.3,121.4],[155.1,125.3],[156.0,129.8],[158.1,139.6],[158.2,140.2],[158.8,229.5],[160.2,149.9],[160.8,229.1],[161.1,154.3],[162.0,158.7],[163.8,167.2],[165.7,176.2],[166.4,179.6],[167.3,184.0],[167.6,228.0],[168.9,192.0],[169.1,192.7],[170.9,201.2],[170.9,201.6],[176.1,226.5],[183.9,225.1]],"aristas":[[19,20],[4,5],[24,29],[26,27],[33,35],[1,2],[25,26],[14,15],[52,53],[55,56],[43,44],[51,58],[35,36],[27,28],[2,3],[20,22],[32,34],[41,42],[39,41],[59,60],[42,49],[21,29],[13,14],[6,7],[10,11],[31,33],[12,13],[17,21],[40,43],[3,4],[22,23],[38,39],[60,61],[23,25],[49,51],[8,10],[54,55],[16,18],[50,52],[18,19],[47,48],[45,46],[34,37],[29,31],[46,47],[8,9],[57,59],[58,63],[5,6],[8,12],[61,62],[63,64],[7,9],[15,16],[62,63],[48,50],[36,38],[53,54],[56,57],[37,40],[44,45],[28,30],[0,1],[30,32]]},"ZONA_2":{"nodos":[[149.8,231.0],[151.4,230.7],[152.2,111.2],[154.3,121.4],[155.1,125.3],[156.0,129.8],[158.1,139.6],[158.2,140.2],[158.8,229.5],[160.2,149.9],[160.8,229.1],[161.1,154.3],[162.0,158.7],[163.8,167.2],[165.7,176.2],[166.4,179.6],[167.3,184.0],[167.6,228.0],[167.8,107.3],[168.9,192.0],[169.1,192.7],[170.9,201.2],[170.9,201.6],[176.1,226.5],[177.2,105.0],[177.4,104.9],[178.9,239.9],[180.3,164.2],[181.4,252.0],[181.5,252.3],[183.9,225.1],[184.2,265.5],[184.3,265.8],[186.7,102.6],[186.7,277.8],[187.2,102.5],[189.7,162.5],[189.8,162.5],[190.3,277.1],[192.2,223.6],[192.4,223.6],[196.6,100.2],[197.2,100.0],[199.6,160.7],[199.8,160.7],[202.3,221.8],[203.3,274.4],[205.6,97.9],[205.9,97.9],[209.7,158.9],[209.9,158.8],[212.0,220.1],[212.2,220.0],[213.1,272.5],[215.0,95.6],[217.7,109.0],[218.3,157.3],[220.2,121.4],[220.3,121.9],[221.8,129.7],[221.9,218.3],[222.1,131.1],[222.1,218.3],[223.1,270.4],[224.2,141.9],[227.0,155.7],[229.5,168.2],[230.3,216.8],[231.4,91.5],[231.9,180.3],[233.0,268.4],[233.7,189.5],[233.7,189.6],[236.1,201.8],[238.8,215.3],[239.6,89.5],[241.0,89.2],[242.0,266.6],[243.8,240.5],[245.0,152.4],[248.2,213.6],[248.7,265.2],[249.3,87.1],[250.9,86.7],[252.2,151.1],[252.6,264.4],[254.3,150.8],[255.6,212.2],[255.6,263.9],[255.8,85.5],[256.1,212.2],[256.6,85.1],[262.2,149.3],[262.4,82.0],[263.6,149.1],[264.8,262.5],[264.9,210.6],[272.2,147.5],[273.4,147.3],[273.9,261.1],[274.2,208.9],[274.3,208.9],[277.5,74.1],[279.9,86.7],[280.8,92.1],[280.9,145.9],[281.7,145.8],[282.0,98.4],[283.0,259.6],[283.8,108.1],[283.8,108.4],[284.1,207.1],[284.1,207.2],[285.4,117.3],[285.5,117.7],[285.7,69.8],[287.2,126.8],[288.7,135.4],[290.4,144.2],[292.6,156.6],[292.9,66.1],[292.9,258.1],[294.0,164.1],[294.2,205.3],[294.9,168.9],[296.6,178.2],[296.6,178.4],[299.2,192.5],[301.3,204.1],[303.1,60.7],[306.0,229.7],[308.4,242.9],[308.7,202.7],[309.8,57.3],[310.7,255.3],[312.5,55.8],[317.2,139.3],[318.2,254.1],[318.4,52.8],[318.5,201.0],[318.7,201.0],[322.1,50.9],[323.2,138.2],[327.3,137.5],[327.4,252.7],[328.9,199.1],[331.7,45.9],[333.9,44.7],[334.6,78.8],[334.8,88.8],[335.0,98.9],[335.2,108.7],[335.4,118.1],[335.8,136.0],[336.4,43.6],[336.4,161.9],[336.5,164.2],[336.6,171.5],[336.8,181.3],[336.8,251.2],[336.9,189.9],[336.9,190.9],[337.0,197.7],[340.6,202.7],[344.3,40.2],[344.6,164.1],[345.1,208.9],[347.0,211.4],[347.7,215.2],[349.2,222.5],[349.9,226.5],[351.9,236.9],[352.8,36.4],[354.1,248.5],[354.3,163.9],[356.4,225.4],[366.2,223.9]],"aristas":[[161,162],[126,127],[44,49],[107,109],[164,172],[133,135],[77,81],[175,176],[153,155],[47,48],[94,97],[18,24],[143,153],[156,157],[95,99],[69,71],[158,160],[141,146],[11,12],[51,52],[105,106],[170,175],[101,112],[14,15],[2,3],[137,144],[10,17],[92,94],[29,31],[84,86],[102,115],[160,161],[121,134],[82,83],[134,137],[169,170],[163,166],[27,36],[0,1],[111,112],[129,133],[108,121],[19,20],[68,75],[171,173],[1,8],[99,108],[146,147],[144,159],[147,154],[124,125],[78,81],[135,138],[64,65],[66,69],[117,118],[88,95],[90,96],[113,114],[65,66],[70,77],[49,50],[25,33],[130,131],[104,107],[156,165],[123,128],[93,102],[24,25],[36,37],[53,63],[125,126],[167,168],[67,74],[96,100],[151,152],[170,171],[55,57],[119,122],[52,60],[60,62],[20,21],[46,53],[168,169],[80,87],[8,10],[154,164],[159,173],[103,104],[148,149],[57,58],[100,101],[59,61],[33,35],[62,67],[86,92],[30,39],[13,14],[45,51],[32,34],[150,151],[89,91],[165,174],[127,128],[115,120],[162,163],[9,11],[28,29],[118,119],[98,105],[50,56],[48,54],[131,134],[37,43],[149,150],[132,139],[6,7],[4,5],[97,98],[39,40],[63,70],[139,140],[102,103],[31,32],[111,123],[38,46],[54,55],[5,6],[128,132],[16,19],[138,141],[58,59],[61,64],[106,118],[17,23],[122,124],[42,47],[21,22],[43,44],[140,145],[23,30],[136,142],[152,153],[142,143],[81,85],[110,113],[22,23],[75,76],[40,45],[157,158],[7,9],[109,110],[85,88],[56,65],[73,74],[114,116],[116,117],[12,13],[91,93],[166,167],[15,16],[74,80],[87,90],[72,73],[83,89],[3,4],[71,72],[26,28],[145,162],[41,42],[34,38],[76,82],[79,84],[35,41],[147,148],[155,156]]},"ZONA_3":{"nodos":[[335.2,108.7],[335.4,118.1],[335.8,136.0],[336.4,161.9],[336.5,164.2],[336.6,171.5],[336.8,181.3],[336.9,189.9],[336.9,190.9],[337.0,197.7],[340.6,202.7],[344.6,164.1],[345.1,208.9],[347.0,211.4],[347.7,215.2],[349.2,222.5],[349.9,226.5],[351.9,236.9],[354.1,248.5],[354.3,163.9],[356.4,225.4],[366.2,223.9],[376.1,222.3],[378.6,163.5],[381.8,163.4],[382.4,188.9],[382.4,189.1],[382.6,198.3],[382.8,207.6],[382.9,214.8],[383.1,221.1],[384.0,221.0],[388.8,163.2],[393.9,219.4],[396.5,219.0],[397.1,163.0],[401.8,218.1],[405.1,162.9],[409.7,216.9],[417.5,30.7],[417.7,39.7],[417.9,50.4],[418.4,75.9],[418.9,97.1],[419.1,107.1],[419.3,116.2],[419.6,133.0],[419.6,215.3],[420.0,150.5],[420.2,159.9],[420.2,162.5],[420.4,169.2],[420.5,178.1],[420.7,187.3],[420.7,188.1],[420.9,197.4],[420.9,197.8],[421.1,207.3],[421.3,215.0],[426.0,75.9],[426.4,76.0],[429.4,213.6],[432.2,132.9],[432.3,132.9],[433.2,78.1],[434.1,78.4],[435.0,31.7],[439.3,212.0],[441.8,33.8],[442.8,81.1],[445.9,132.7],[447.4,82.6],[448.3,132.7],[449.1,210.3],[451.6,134.1],[451.9,36.9],[452.5,84.2],[455.6,209.2],[456.4,207.5],[457.5,205.1],[459.4,86.3],[459.4,137.5],[459.8,200.0],[461.4,39.8],[461.9,195.5],[462.1,87.1],[464.9,189.2],[466.0,186.6],[468.7,180.9],[469.8,178.5],[470.4,89.7],[471.3,90.0],[472.7,172.3],[473.6,170.3],[476.7,163.7],[477.4,162.0],[479.9,92.7],[481.4,153.5],[483.9,148.0],[485.6,144.3],[487.2,140.9],[489.7,48.4],[489.8,135.3],[491.3,132.0],[493.9,126.5],[495.4,123.2],[498.0,117.6],[499.2,51.3],[499.4,114.5],[502.0,108.8],[504.0,104.6],[506.1,100.0],[508.5,54.1],[509.1,93.5],[510.3,91.0],[513.2,84.8],[513.9,83.2],[517.2,56.8],[525.0,59.2],[532.9,61.9]],"aristas":[[104,105],[92,93],[8,9],[38,47],[59,60],[100,102],[95,97],[20,21],[56,57],[26,27],[2,3],[24,32],[75,83],[86,87],[23,24],[79,82],[50,51],[73,77],[118,119],[4,5],[61,67],[113,114],[6,7],[87,88],[16,20],[60,64],[62,63],[46,48],[107,112],[102,103],[74,81],[68,75],[33,34],[7,8],[15,16],[10,12],[76,80],[99,100],[117,118],[84,86],[70,72],[88,89],[111,113],[39,40],[115,116],[45,46],[17,18],[48,49],[40,41],[67,73],[69,71],[90,91],[42,59],[72,74],[98,99],[28,29],[27,28],[57,58],[78,79],[4,11],[66,68],[51,52],[42,43],[53,54],[39,66],[41,42],[25,26],[109,110],[31,33],[13,14],[112,117],[0,1],[16,17],[77,78],[30,31],[14,15],[46,62],[114,115],[106,108],[116,118],[103,104],[63,70],[54,55],[22,30],[108,109],[110,111],[11,19],[9,10],[32,35],[43,44],[85,90],[49,50],[58,61],[82,84],[64,65],[65,69],[101,107],[34,36],[97,98],[1,2],[35,37],[52,53],[5,6],[36,38],[24,25],[29,30],[12,13],[71,76],[44,45],[94,95],[105,106],[55,56],[93,94],[47,58],[91,96],[21,22],[80,85],[89,92],[3,4]]}}
+;
+  const VELOCIDAD_TRACTOR = 12; // unidades del mapa por segundo
+
+  // Cortacesped: opcion alternativa al emoji de tractor, a modo de
+  // prueba (togglear desde el panel "PROBAR DESTELLOS"). Viene
+  // espejada de origen para que en reposo mire hacia la izquierda,
+  // igual que el emoji — asi la misma logica de mirror/rotate de
+  // posicionar() sirve sin cambios para los dos iconos.
+  function crearTractor(zonaId, grafoKey){
+    const grafo = GRAFOS_TRACTOR[grafoKey];
+    if(!grafo) return null;
+    const adj = {};
+    grafo.aristas.forEach(([i,j])=>{
+      (adj[i] = adj[i]||[]).push(j);
+      (adj[j] = adj[j]||[]).push(i);
+    });
+    const svgNS2 = 'http://www.w3.org/2000/svg';
+    const realSvgEl = document.getElementById('realSvg');
+    const g = document.createElementNS(svgNS2,'g');
+    g.setAttribute('id','tractor_'+zonaId);
+    g.setAttribute('opacity','0');
+    g.innerHTML = '<text class="icono-tractor-emoji" x="0" y="0" font-size="13.31" text-anchor="middle">🚜</text>';
+    realSvgEl.appendChild(g);
+
+    let actual = Math.floor(Math.random()*grafo.nodos.length);
+    let anterior = -1;
+    let raf = null;
+    let activo = false;
+
+    function posicionar(x,y,angDeg){
+      // El emoji del tractor, en reposo, mira hacia la IZQUIERDA y
+      // derecho (techo arriba). Antes rotabamos libremente 360°, y
+      // cerca de 180° (viajando en diagonal hacia la izquierda) eso lo
+      // pone literalmente boca abajo — una rotacion de 180 SIEMPRE
+      // invierte arriba/abajo, es inevitable con rotacion pura.
+      // Solucion real: para mirar a la derecha, se ESPEJA (no se rota
+      // 180), y la inclinacion por arriba/abajo queda acotada a ±90°,
+      // asi el techo nunca queda para abajo.
+      let dx = Math.cos(angDeg*Math.PI/180);
+      let dy = Math.sin(angDeg*Math.PI/180);
+      let mirror, tilt;
+      if(dx >= 0){
+        mirror = -1;           // espejar para que el frente (que mira a la izq. en reposo) quede a la derecha
+        tilt = angDeg;         // ya esta acotado a [-90,90] cuando dx>=0
+      } else {
+        mirror = 1;            // sin espejar, el reposo ya mira a la izquierda
+        tilt = angDeg > 0 ? angDeg-180 : angDeg+180; // acota a [-90,90] tambien
+      }
+      g.setAttribute('transform','translate('+x+','+y+') rotate('+tilt+') scale('+mirror+',1)');
+    }
+    const n0 = grafo.nodos[actual];
+    posicionar(n0[0], n0[1], 0);
+
+    function moverA(destino){
+      if(!activo) return;
+      const p0 = grafo.nodos[actual], p1 = grafo.nodos[destino];
+      const dist = Math.hypot(p1[0]-p0[0], p1[1]-p0[1]);
+      const dur = Math.max(300, dist/VELOCIDAD_TRACTOR*1000);
+      const ang = Math.atan2(p1[1]-p0[1], p1[0]-p0[0]) * 180/Math.PI;
+      const t0 = performance.now();
+      function frame(now){
+        if(!activo) return;
+        const t = Math.min(1, (now-t0)/dur);
+        const x = p0[0] + (p1[0]-p0[0])*t;
+        const y = p0[1] + (p1[1]-p0[1])*t;
+        posicionar(x,y,ang);
+        if(t<1){ raf = requestAnimationFrame(frame); }
+        else{
+          anterior = actual; actual = destino;
+          elegirSiguiente();
+        }
+      }
+      raf = requestAnimationFrame(frame);
+    }
+    function elegirSiguiente(){
+      const vecinos = adj[actual] || [];
+      let opciones = vecinos.filter(n => n !== anterior);
+      if(opciones.length === 0) opciones = vecinos; // sin salida -> vuelve
+      if(opciones.length === 0) return; // nodo aislado, no deberia pasar
+      const siguiente = opciones[Math.floor(Math.random()*opciones.length)];
+      moverA(siguiente);
+    }
+
+    return {
+      iniciar(){ if(activo) return; activo = true; elegirSiguiente(); },
+      detener(){ activo = false; if(raf) cancelAnimationFrame(raf); },
+      el: g,
+    };
+  }
+
+  const tractores = {
+    'Mantenimiento_ZONA_1': crearTractor('Mantenimiento_ZONA_1', 'ZONA_3'),
+    'Mantenimiento_ZONA_2': crearTractor('Mantenimiento_ZONA_2', 'ZONA_2'),
+    'Mantenimiento_ZONA_3_1_': crearTractor('Mantenimiento_ZONA_3_1_', 'ZONA_1'),
+  };
+  function mostrarTractor(zonaId, on){
+    const t = tractores[zonaId];
+    if(!t) return;
+    t.el.setAttribute('opacity', on ? '1' : '0');
+    if(on) t.iniciar(); else t.detener();
+  }
+
 function apagarZonas(){
   [1,2,3].forEach(z=>{
     const g = document.getElementById(ZONA_GROUP_REAL_ID[z]);
     if(g) g.classList.remove(ZONA_CLASE[z]);
+    mostrarTractor(ZONA_GROUP_REAL_ID[z], false);
   });
   document.querySelectorAll('.legend button').forEach(b=>b.classList.remove('active'));
 }
@@ -33961,6 +34079,7 @@ function pulsarZona(zona, updateUrl){
   apagarZonas();
   const g = document.getElementById(ZONA_GROUP_REAL_ID[zona]);
   if(g) g.classList.add(ZONA_CLASE[zona]);
+  mostrarTractor(ZONA_GROUP_REAL_ID[zona], true);
   document.querySelector('.legend button[data-zona="'+zona+'"]').classList.add('active');
   mostrarSheetZona(zona);
   if(updateUrl){
@@ -33996,6 +34115,7 @@ function irALote(id, updateUrl){
   apagarZonas();
   const g = document.getElementById(ZONA_GROUP_REAL_ID[info.zona]);
   if(g) g.classList.add(ZONA_CLASE[info.zona]);
+  mostrarTractor(ZONA_GROUP_REAL_ID[info.zona], true);
   const el = document.getElementById(info.domId);
   if(el){
     el.classList.add('lote-seleccionado', 'lz'+info.zona);
@@ -34037,6 +34157,14 @@ input.addEventListener('keydown', (e)=>{
     const q = input.value.trim().toUpperCase();
     if(LOTES[q]) irALote(q, true);
   }
+});
+
+const btnVerCalles = document.getElementById('btnVerCalles');
+const callesGroup = document.getElementById('CALLES');
+btnVerCalles.addEventListener('click', ()=>{
+  const on = !callesGroup.classList.contains('show');
+  callesGroup.classList.toggle('show', on);
+  btnVerCalles.classList.toggle('active', on);
 });
 
 (function(){
