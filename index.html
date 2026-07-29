@@ -17,13 +17,47 @@
   *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
   html,body{margin:0;padding:0;background:#115255;font-family:'Roboto',Arial,sans-serif;color:var(--petroleo);}
 
-  header{padding:16px 16px 4px; text-align:center;}
-  header .logo-row{display:flex; align-items:center; justify-content:center; gap:8px;}
-  header h1{color:var(--hueso); font-size:18px; margin:0; font-weight:700;}
-  header p{color:var(--verdecl); font-size:12.5px; margin:5px auto 0; max-width:480px; line-height:1.5;}
-  header{ max-height:120px; opacity:1; overflow:hidden; transition:max-height .3s ease, opacity .25s ease, padding .3s ease; }
-  header.oculto{ max-height:0; opacity:0; padding-top:0; padding-bottom:0; }
-  #menuLogoIcon{ width:22px; height:22px; }
+  /* ---- boton del logo + menu desplegable: mismo patron pin-btn /
+         destinos-menu que Mapa Operativo y Como Llegar. Anclado inline
+         (no fixed) porque esta app vive en una pagina con scroll propio,
+         no sobre un mapa a pantalla completa; el menu se abre en absolute
+         para no empujar el buscador/leyenda hacia abajo. ---- */
+  .destinos-wrap{ position:relative; padding:14px 14px 0; z-index:70; }
+  .pin-btn{
+    width:50px; height:50px; border-radius:50%; border:1px solid rgba(255,255,255,.5);
+    background:rgba(255,255,255,.4);
+    color:var(--petroleo); font-size:20px; box-shadow:0 3px 10px rgba(0,0,0,.25), inset 0 1px 1px rgba(255,255,255,.6);
+    opacity:.88; transform:scale(1); transition:opacity .2s ease, background .25s ease, transform .25s cubic-bezier(.34,1.56,.64,1);
+    display:flex; align-items:center; justify-content:center; padding:0; cursor:pointer; position:relative;
+  }
+  .pin-btn:active, .pin-btn.open{ opacity:1; background:#fff; transform:scale(1.08); }
+  #menuLogoIcon{ width:30px; height:30px; pointer-events:none; }
+  /* puntito que indica que el logo es tappable */
+  .pin-btn::after{
+    content:''; position:absolute; width:9px; height:9px; border-radius:50%;
+    background:var(--naranja); border:2px solid var(--petroleo);
+    transform:translate(15px,-15px);
+  }
+
+  .destinos-menu{
+    position:absolute; top:66px; left:14px; z-index:70;
+    display:flex; flex-direction:column; gap:8px;
+    max-height:0; overflow:hidden; opacity:0; transform:translateY(-8px);
+    transition:max-height .3s cubic-bezier(.22,.9,.3,1), opacity .22s ease, transform .28s cubic-bezier(.22,.9,.3,1);
+    width:250px; pointer-events:none;
+  }
+  .destinos-menu.open{ max-height:600px; opacity:1; transform:translateY(0); overflow-y:auto; pointer-events:auto; }
+  .destinos-menu button{
+    background:rgba(255,255,255,.97); color:var(--petroleo); border:none; border-radius:14px; padding:10px 16px;
+    font-size:13px; font-weight:700; text-align:left; box-shadow:0 3px 10px rgba(0,0,0,.25), inset 0 1px 1px rgba(255,255,255,.6);
+    cursor:pointer;
+  }
+  .destinos-menu button:active{ background:var(--hueso); }
+  .destinos-menu button.btn-cgv{ background:rgba(196,223,87,.94); color:var(--petroleo); }
+
+  /* boton EugenIA dentro del card de Consultas — calcado de Mapa Operativo/Como Llegar */
+  .eugenia-block{ text-align:center; margin:18px 0 6px; }
+  .btn-eugenia{ background:var(--lima); color:var(--petroleo); border:none; border-radius:14px; padding:12px 18px; width:100%; font-size:14px; font-weight:700; box-shadow:0 3px 8px rgba(19,84,87,.25); }
 
   .legend{display:flex; gap:8px; margin:12px 14px 0;}
   .legend button{
@@ -120,21 +154,20 @@
   .contacto-btn:last-child{border-bottom:none;}
   .contacto-btn .ir{color:inherit; text-decoration:none; font-weight:700;}
 
-  .cta-row{display:flex; gap:10px; margin:16px 14px 20px;}
-  .cta{flex:1; text-align:center; padding:12px 8px; border-radius:14px; font-size:12.5px; font-weight:700; text-decoration:none;}
-  .cta.gold{background:var(--naranja); color:var(--petroleo);}
-  .cta.lima{background:var(--lima); color:var(--petroleo);}
+
 </style>
 </head>
 <body>
 
-<header>
-  <div class="logo-row">
-    <svg id="menuLogoIcon" viewBox="903.5 -97.7 827.5 827.5" xmlns="http://www.w3.org/2000/svg"><path fill="#D87C1F" d="M1584.7,668.6c-0.2-1.2-0.6-4.5-0.9-7.2c-0.6-5.6-0.9-8.3-1.8-14.7c-0.3-2.4-0.8-7.1-1.2-10.2c-0.3-3.1-0.9-9.4-1.4-13.9c-0.5-4.5-1.1-10.8-1.4-14s-0.7-6.5-0.9-7.3c-0.2-0.8-0.6-4.2-1-7.6c-1.1-11.1-2.9-27-4.3-39.3c-0.5-4.2-1.1-10.3-1.5-13.7c-0.3-3.4-1-9.8-1.5-14.3c-0.5-4.5-1.2-11.2-1.5-14.9c-0.3-3.7-0.9-7.9-1.2-9.3c-0.3-1.5-0.6-4.2-0.8-6.1c-0.2-1.9-1-9.7-1.7-17.2c-0.8-7.5-1.6-14.9-1.7-16.3c-0.1-1.5-0.5-4.8-0.9-7.6c-1.8-14.6-3.4-28.9-4.7-41.4c-2.2-20.8-2.7-22-15.7-35.9c-8.9-9.4-11.5-12.4-18.9-20.7c-4.2-4.6-11-12.1-15.2-16.5c-4.1-4.4-8.5-9.2-9.6-10.5c-1.1-1.3-3.9-4.4-6.1-6.8c-2.3-2.4-5.2-5.5-6.5-7c-1.2-1.5-5.1-5.6-8.5-9.3c-3.4-3.7-7.1-7.7-8.2-9c-1.1-1.3-5.3-5.9-9.3-10.3c-4-4.4-8.3-9.1-9.6-10.6c-5.7-6.5-12.8-14.2-20.2-22.1c-4.4-4.7-8.7-9.4-9.6-10.6c-1.5-1.9-5-5.7-16.8-18.5c-2.6-2.8-6.5-7.1-8.7-9.6c-2.2-2.6-7.2-8-11.1-12.2c-3.8-4.1-8.5-9.2-10.2-11.2c-3.4-3.8-7.8-8.7-19.8-21.9c-4-4.4-10.4-11.4-14.3-15.7c-3.8-4.3-10.8-11.9-15.4-17c-4.7-5-11.6-12.7-15.4-16.9c-3.8-4.3-10.1-11.2-14-15.4c-3.9-4.2-7.9-8.7-9-10c-1-1.3-4-4.5-6.6-7.3c-7.1-7.5-22.5-24.3-24.8-27c-1.1-1.3-4-4.5-6.4-7.1c-2.4-2.6-6.6-7.1-9.3-10.1c-2.7-3-6.8-7.5-9-10c-16.2-17.7-21-23-22.7-25c-4.1-5-22.2-24.8-27.2-29.8c-5.9-5.9-13.9-8.5-21.7-7c-2.7,0.5-7.5,3-9.7,5.2c-4.2,3.8-6.5,9.2-7.5,17c-0.3,2.7-1,7.2-1.5,10c-0.5,2.7-1.2,6.9-1.5,9.3c-0.3,2.4-0.9,7.8-1.4,12c-0.5,4.1-1.2,9.3-1.5,11.4c-0.3,2.1-1,6.8-1.5,10.5s-1.2,9.4-1.7,12.8c-0.5,3.4-1.2,8.2-1.5,10.8c-0.3,2.6-1,7.4-1.5,10.8c-0.5,3.4-1.3,9.3-1.8,13.1c-2.3,17.6-3.1,23.1-3.7,26.8c-0.3,1.6-0.9,6.8-1.5,11.7c-0.5,4.8-1.2,9.7-1.5,10.8c-0.3,1.1-0.8,4.8-1.1,8.2c-0.3,3.4-1,8.9-1.5,12.2c-1,6.5-1.4,9-2.9,19.8c-0.5,3.7-1.2,8.5-1.5,10.8c-1.2,8-3.1,21.9-4.7,33.8c-0.3,2.2-0.6,4.5-0.8,5c-0.2,0.5-0.6,3.2-0.9,6.1c-0.8,6.9-2.7,22.2-4.4,34.1c-0.5,3.4-1.1,8.2-1.5,10.8c-0.3,2.6-0.7,5.2-0.9,5.8c-0.2,0.6-0.6,3.1-0.9,5.5s-0.9,7.2-1.5,10.8c-0.5,3.5-1.1,7.5-1.2,8.7c-0.4,3.6-1.9,14.9-2.3,17.2c-0.2,1.1-0.7,4.9-1.2,8.5c-0.5,3.5-1.1,8.4-1.4,10.8c-0.3,2.4-1,7.2-1.5,10.8c-1.3,9.7-1.5,10.6-2.3,16.9c-0.5,3.2-0.9,6.8-1.1,7.9c-0.1,1.1-0.7,4.9-1.2,8.5c-0.5,3.5-1,7.3-1.2,8.5c-1.2,9.2-2.1,15.7-2.3,16.9c-0.1,0.8-0.4,2.6-0.6,4.1c-0.6,5.8-1.5,11.7-2.3,17.8c-1.7,12-2,14-2.9,21.6c-0.5,4.1-1.1,9-1.3,10.8c-0.2,1.7-0.8,5.5-1.2,8.5c-0.4,2.9-0.9,6.5-1.2,8.2c-0.3,1.6-0.9,6.5-1.5,10.8c-0.5,4.3-1.2,9.2-1.5,10.8c-0.3,1.6-0.8,5-1.1,7.6c-0.3,2.6-1,7.2-1.5,10.2s-1.1,7.8-1.5,10.5c-0.3,2.7-1,7.6-1.5,10.8c-0.5,3.2-1.2,7.9-1.5,10.5c-0.5,4.4-1.2,9.7-3.3,24.8c-0.5,3.4-1.1,8.1-1.3,10.5c-0.3,2.4-0.7,5.1-0.9,5.9c-0.3,1.4-0.6,3.3-2,15.4c-0.6,5.1-1.2,9.4-2.5,16.3c-0.3,1.9-0.8,5.5-1,7.9c-1.1,9.9-1.7,15-2.4,18.7c-1,6-0.5,13.1,1.3,16.9c2.6,5.6,7.9,10,14,11.8c3.6,1,498.3,1.5,503,0.4c7.2-1.6,14-6.7,16.6-12.5C1584.1,676.3,1585.2,671.3,1584.7,668.6z"/></svg>
-    <h1>Zonas de Mantenimiento</h1>
+<div class="destinos-wrap" id="destinosFloat">
+  <button class="pin-btn" id="btnLogoMenu"><span class="pin-icon"><svg id="menuLogoIcon" viewBox="903.5 -97.7 827.5 827.5" xmlns="http://www.w3.org/2000/svg"><path fill="#D87C1F" d="M1584.7,668.6c-0.2-1.2-0.6-4.5-0.9-7.2c-0.6-5.6-0.9-8.3-1.8-14.7c-0.3-2.4-0.8-7.1-1.2-10.2c-0.3-3.1-0.9-9.4-1.4-13.9c-0.5-4.5-1.1-10.8-1.4-14s-0.7-6.5-0.9-7.3c-0.2-0.8-0.6-4.2-1-7.6c-1.1-11.1-2.9-27-4.3-39.3c-0.5-4.2-1.1-10.3-1.5-13.7c-0.3-3.4-1-9.8-1.5-14.3c-0.5-4.5-1.2-11.2-1.5-14.9c-0.3-3.7-0.9-7.9-1.2-9.3c-0.3-1.5-0.6-4.2-0.8-6.1c-0.2-1.9-1-9.7-1.7-17.2c-0.8-7.5-1.6-14.9-1.7-16.3c-0.1-1.5-0.5-4.8-0.9-7.6c-1.8-14.6-3.4-28.9-4.7-41.4c-2.2-20.8-2.7-22-15.7-35.9c-8.9-9.4-11.5-12.4-18.9-20.7c-4.2-4.6-11-12.1-15.2-16.5c-4.1-4.4-8.5-9.2-9.6-10.5c-1.1-1.3-3.9-4.4-6.1-6.8c-2.3-2.4-5.2-5.5-6.5-7c-1.2-1.5-5.1-5.6-8.5-9.3c-3.4-3.7-7.1-7.7-8.2-9c-1.1-1.3-5.3-5.9-9.3-10.3c-4-4.4-8.3-9.1-9.6-10.6c-5.7-6.5-12.8-14.2-20.2-22.1c-4.4-4.7-8.7-9.4-9.6-10.6c-1.5-1.9-5-5.7-16.8-18.5c-2.6-2.8-6.5-7.1-8.7-9.6c-2.2-2.6-7.2-8-11.1-12.2c-3.8-4.1-8.5-9.2-10.2-11.2c-3.4-3.8-7.8-8.7-19.8-21.9c-4-4.4-10.4-11.4-14.3-15.7c-3.8-4.3-10.8-11.9-15.4-17c-4.7-5-11.6-12.7-15.4-16.9c-3.8-4.3-10.1-11.2-14-15.4c-3.9-4.2-7.9-8.7-9-10c-1-1.3-4-4.5-6.6-7.3c-7.1-7.5-22.5-24.3-24.8-27c-1.1-1.3-4-4.5-6.4-7.1c-2.4-2.6-6.6-7.1-9.3-10.1c-2.7-3-6.8-7.5-9-10c-16.2-17.7-21-23-22.7-25c-4.1-5-22.2-24.8-27.2-29.8c-5.9-5.9-13.9-8.5-21.7-7c-2.7,0.5-7.5,3-9.7,5.2c-4.2,3.8-6.5,9.2-7.5,17c-0.3,2.7-1,7.2-1.5,10c-0.5,2.7-1.2,6.9-1.5,9.3c-0.3,2.4-0.9,7.8-1.4,12c-0.5,4.1-1.2,9.3-1.5,11.4c-0.3,2.1-1,6.8-1.5,10.5s-1.2,9.4-1.7,12.8c-0.5,3.4-1.2,8.2-1.5,10.8c-0.3,2.6-1,7.4-1.5,10.8c-0.5,3.4-1.3,9.3-1.8,13.1c-2.3,17.6-3.1,23.1-3.7,26.8c-0.3,1.6-0.9,6.8-1.5,11.7c-0.5,4.8-1.2,9.7-1.5,10.8c-0.3,1.1-0.8,4.8-1.1,8.2c-0.3,3.4-1,8.9-1.5,12.2c-1,6.5-1.4,9-2.9,19.8c-0.5,3.7-1.2,8.5-1.5,10.8c-1.2,8-3.1,21.9-4.7,33.8c-0.3,2.2-0.6,4.5-0.8,5c-0.2,0.5-0.6,3.2-0.9,6.1c-0.8,6.9-2.7,22.2-4.4,34.1c-0.5,3.4-1.1,8.2-1.5,10.8c-0.3,2.6-0.7,5.2-0.9,5.8c-0.2,0.6-0.6,3.1-0.9,5.5s-0.9,7.2-1.5,10.8c-0.5,3.5-1.1,7.5-1.2,8.7c-0.4,3.6-1.9,14.9-2.3,17.2c-0.2,1.1-0.7,4.9-1.2,8.5c-0.5,3.5-1.1,8.4-1.4,10.8c-0.3,2.4-1,7.2-1.5,10.8c-1.3,9.7-1.5,10.6-2.3,16.9c-0.5,3.2-0.9,6.8-1.1,7.9c-0.1,1.1-0.7,4.9-1.2,8.5c-0.5,3.5-1,7.3-1.2,8.5c-1.2,9.2-2.1,15.7-2.3,16.9c-0.1,0.8-0.4,2.6-0.6,4.1c-0.6,5.8-1.5,11.7-2.3,17.8c-1.7,12-2,14-2.9,21.6c-0.5,4.1-1.1,9-1.3,10.8c-0.2,1.7-0.8,5.5-1.2,8.5c-0.4,2.9-0.9,6.5-1.2,8.2c-0.3,1.6-0.9,6.5-1.5,10.8c-0.5,4.3-1.2,9.2-1.5,10.8c-0.3,1.6-0.8,5-1.1,7.6c-0.3,2.6-1,7.2-1.5,10.2s-1.1,7.8-1.5,10.5c-0.3,2.7-1,7.6-1.5,10.8c-0.5,3.2-1.2,7.9-1.5,10.5c-0.5,4.4-1.2,9.7-3.3,24.8c-0.5,3.4-1.1,8.1-1.3,10.5c-0.3,2.4-0.7,5.1-0.9,5.9c-0.3,1.4-0.6,3.3-2,15.4c-0.6,5.1-1.2,9.4-2.5,16.3c-0.3,1.9-0.8,5.5-1,7.9c-1.1,9.9-1.7,15-2.4,18.7c-1,6-0.5,13.1,1.3,16.9c2.6,5.6,7.9,10,14,11.8c3.6,1,498.3,1.5,503,0.4c7.2-1.6,14-6.7,16.6-12.5C1584.1,676.3,1585.2,671.3,1584.7,668.6z"/></svg></span></button>
+  <div class="destinos-menu" id="destinosMenu">
+    <button id="btnResiduosVerdes">Recolección de residuos verdes</button>
+    <button id="btnPodasMenu">Podas medianas y grandes</button>
+    <button id="btnConsultas">Consultas e información</button>
+    <button class="btn-cgv" id="btnCGV">Centro de Gestión Vecinal</button>
   </div>
-  <p>La Eugenia divide el mantenimiento del barrio en 3 zonas.<br>Elegí la tuya o buscá tu lote.</p>
-</header>
+</div>
 
 <div class="legend">
   <button class="lz3" data-zona="3"><span>Zona 3</span></button>
@@ -33948,12 +33981,6 @@ AAAAAAAAAAAAAAAAAAAAAAAAgEj/BEfDIS5Jha1kAAAAAElFTkSuQmCC" transform="matrix(6.86
 
 <div class="map-controls">
   <button id="btnVerCalles">Ver calles</button>
-  <button id="btnPodasGrandes">Podas grandes</button>
-</div>
-
-<div class="cta-row">
-  <a class="cta gold" href="https://wa.me/5493764880000" target="_blank" rel="noopener">Contactar a Intendencia</a>
-  <a class="cta lima" href="https://clubdecampolaeugenia.taplink.site/" target="_blank" rel="noopener">Centro de Gestión Vecinal</a>
 </div>
 
 <script>
@@ -34223,7 +34250,6 @@ function mostrarSheetZona(zona, loteId){
   document.getElementById('sheetBody').innerHTML = infoZonaHTML(zona);
   if(window.resetAlturaSheet) window.resetAlturaSheet();
   document.getElementById('sheet').classList.add('show');
-  document.querySelector('header').classList.add('oculto');
   subirMapaALaVista();
   document.getElementById('btnGrandesPodasInline').addEventListener('click', (e)=>{
     e.stopPropagation();
@@ -34248,7 +34274,6 @@ function pulsarZona(zona, updateUrl){
 
 function cerrarSheet(){
   document.getElementById('sheet').classList.remove('show');
-  document.querySelector('header').classList.remove('oculto');
   volverASolido();
   limpiarLoteSeleccionado();
   const url = new URL(location.href);
@@ -34364,7 +34389,7 @@ document.getElementById('sheet').addEventListener('click', ()=>{
 document.addEventListener('click', (e)=>{
   const sheet = document.getElementById('sheet');
   if(!sheet.classList.contains('show')) return;
-  const esControlPropio = e.target.closest('#sheet, .legend button, #btnPodasGrandes, .suggestion-item, #searchInput');
+  const esControlPropio = e.target.closest('#sheet, .legend button, .destinos-menu, .pin-btn, .suggestion-item, #searchInput');
   if(esControlPropio) return;
   cerrarSheet();
 });
@@ -34424,10 +34449,70 @@ function mostrarPodas(){
   document.getElementById('sheetBody').innerHTML = contactosPodasHTML;
   if(window.resetAlturaSheet) window.resetAlturaSheet();
   document.getElementById('sheet').classList.add('show');
-  document.querySelector('header').classList.add('oculto');
   subirMapaALaVista();
 }
-document.getElementById('btnPodasGrandes').addEventListener('click', mostrarPodas);
+// --- Menú del logo (patrón pin-btn / destinos-menu, calcado de Mapa Operativo/Como Llegar) ---
+function abrirSheetGenerico(titulo, bodyHTML){
+  limpiarLoteSeleccionado();
+  apagarZonas();
+  document.getElementById('sheetTitulo').textContent = titulo;
+  document.getElementById('sheetSwatch').style.background = 'transparent';
+  document.getElementById('sheetSwatch').innerHTML = '';
+  document.getElementById('sheetBody').innerHTML = bodyHTML;
+  if(window.resetAlturaSheet) window.resetAlturaSheet();
+  document.getElementById('sheet').classList.add('show');
+  subirMapaALaVista();
+}
+
+const btnLogoMenu = document.getElementById('btnLogoMenu');
+const destinosMenu = document.getElementById('destinosMenu');
+
+btnLogoMenu.addEventListener('click', (e)=>{
+  e.stopPropagation();
+  const open = destinosMenu.classList.toggle('open');
+  btnLogoMenu.classList.toggle('open', open);
+});
+document.addEventListener('click', (e)=>{
+  const wrap = document.getElementById('destinosFloat');
+  if(destinosMenu.classList.contains('open') && wrap && !wrap.contains(e.target)){
+    destinosMenu.classList.remove('open');
+    btnLogoMenu.classList.remove('open');
+  }
+});
+
+document.getElementById('btnResiduosVerdes').addEventListener('click', (e)=>{
+  e.stopPropagation();
+  const html = '<p>La recolección se realiza actualmente con una frecuencia mensual.</p>'
+    + '<p>El Club retira exclusivamente césped y pequeñas podas provenientes del mantenimiento habitual de los jardines.</p>'
+    + '<p>Los residuos deberán depositarse en ponchadas, sin mezclarlos con residuos no biodegradables ni materiales inflamables.</p>'
+    + '<p style="margin:0;">Se solicita no depositar residuos de poda o basura en terrenos baldíos.</p>';
+  abrirSheetGenerico('Recolección de residuos verdes', html);
+  destinosMenu.classList.remove('open'); btnLogoMenu.classList.remove('open');
+});
+
+document.getElementById('btnPodasMenu').addEventListener('click', (e)=>{
+  e.stopPropagation();
+  mostrarPodas();
+  destinosMenu.classList.remove('open'); btnLogoMenu.classList.remove('open');
+});
+
+document.getElementById('btnConsultas').addEventListener('click', (e)=>{
+  e.stopPropagation();
+  const html = '<p>Consultá con nuestra asistente virtual sobre La Eugenia, sus servicios, actividades, horarios, contactos y mucho más.</p>'
+    + '<div class="eugenia-block"><button class="btn-eugenia" id="btnEugenia">EugenIA 🙋🏻\u200d♀️</button></div>';
+  abrirSheetGenerico('¿Necesitás información o tenés una consulta?', html);
+  destinosMenu.classList.remove('open'); btnLogoMenu.classList.remove('open');
+  document.getElementById('btnEugenia').addEventListener('click', ()=>{
+    const msg = encodeURIComponent('¡Hola! Me dijeron que sos EugenIA 🙋🏻\u200d♀️, la asistente virtual del Club La Eugenia. Te escribo desde la app "Zonas de Mantenimiento" porque necesito hacerte una consulta.');
+    window.location.href = 'https://wa.me/5493764113300?text='+msg;
+  });
+});
+
+document.getElementById('btnCGV').addEventListener('click', (e)=>{
+  e.stopPropagation();
+  window.open('https://clubdecampolaeugenia.taplink.site/', '_blank');
+  destinosMenu.classList.remove('open'); btnLogoMenu.classList.remove('open');
+});
 
 // Animacion de bienvenida: las 3 zonas pulsan juntas 2 segundos y se apagan
 let bienvenidaTimeout = null;
