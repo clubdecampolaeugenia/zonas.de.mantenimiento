@@ -88,11 +88,11 @@
   .lote-seleccionado.lz3{ fill:var(--zona3) !important; }
 
   .sheet{
-    position:fixed; left:14px; right:14px; bottom:0; z-index:80;
-    background:linear-gradient(135deg, #eef3f2, #dbe4e2); border:1px solid rgba(255,255,255,.5); border-bottom:none;
-    color:var(--petroleo); border-radius:24px 24px 0 0;
-    padding:18px 22px calc(20px + env(safe-area-inset-bottom)); backdrop-filter:blur(10px);
-    box-shadow:0 -8px 24px rgba(0,0,0,.35), inset 0 1px 1px rgba(255,255,255,.6);
+    position:fixed; left:8px; right:8px; bottom:0; z-index:80;
+    background:rgba(255,255,255,.78); border:none;
+    color:var(--petroleo); border-radius:20px 20px 0 0;
+    padding:16px 18px calc(18px + env(safe-area-inset-bottom)); backdrop-filter:blur(10px);
+    box-shadow:0 -6px 20px rgba(0,0,0,.35);
     height:52vh; max-height:52vh; overflow-y:auto; -webkit-overflow-scrolling:touch;
     transform:translateY(120%); opacity:0; pointer-events:none;
     transition:transform .32s cubic-bezier(.22,.9,.3,1), opacity .28s ease, height .28s cubic-bezier(.22,.9,.3,1);
@@ -102,22 +102,21 @@
   .sheet .handle{width:44px; height:5px; background:rgba(19,84,87,.45); border-radius:4px; margin:0 auto; padding:14px 0 12px; background-clip:content-box; touch-action:none;}
   .sheet .head{display:flex; align-items:center; gap:10px; margin-bottom:14px;}
   .sheet .head .swatch{width:14px; height:14px; border-radius:4px; flex-shrink:0;}
-  .sheet .head h3{margin:0; font-family:'Anton',sans-serif; font-weight:400; font-size:26px; text-transform:uppercase; letter-spacing:.01em; color:var(--petroleo); flex:1; line-height:1.05;}
+  .sheet .head h3{margin:0; font-family:'Anton',Impact,sans-serif; font-weight:400; font-size:16px; text-transform:uppercase; color:var(--petroleo); flex:1; line-height:1.2;}
   .sheet .head button{background:none; border:none; color:var(--gris); font-size:13px; cursor:pointer;}
-  .sheet p{font-size:15px; line-height:1.6; margin:0 0 14px; color:#1c3335;}
-  .sheet p.nota{font-size:13px; color:var(--gris); font-style:italic;}
-  .sheet ul{margin:0 0 14px; padding-left:20px;}
-  .sheet li{font-size:15px; line-height:1.6; margin-bottom:6px; color:#1c3335;}
+  .sheet p{font-size:13px; line-height:1.5; margin:0 0 10px; color:var(--petroleo);}
+  .sheet p.nota{font-size:11px; color:var(--gris); font-style:italic;}
+  .sheet ul{margin:0 0 10px; padding-left:18px;}
+  .sheet li{font-size:13px; line-height:1.5; margin-bottom:4px; color:var(--petroleo);}
   .sheet hr{border:none; border-top:1px solid #e2ddd0; margin:14px 0;}
   .btn-podas-inline{
     display:block; width:100%; color:var(--petroleo); border:none;
     border-radius:12px; padding:12px; font-size:13px; font-weight:700; margin-top:10px; cursor:pointer;
   }
   .contactos{display:flex; flex-direction:column; margin-top:4px;}
-  .contacto-btn{display:flex; align-items:center; justify-content:space-between; text-decoration:none; font-size:15px; font-weight:700; color:#1c3335; padding:14px 0; border-bottom:1px solid rgba(19,84,87,.15);}
+  .contacto-btn{display:flex; justify-content:space-between; align-items:center; font-size:13px; padding:4px 0; border-bottom:1px solid rgba(19,84,87,.14); text-decoration:none; color:var(--petroleo);}
   .contacto-btn:last-child{border-bottom:none;}
-  .contacto-btn .ir{color:var(--petroleo); font-size:15px; font-weight:700; display:flex; align-items:center; gap:4px;}
-  .contacto-btn .ir .flecha{color:#2f7ea3;}
+  .contacto-btn .ir{color:inherit; text-decoration:none; font-weight:700;}
 
   .cta-row{display:flex; gap:10px; margin:16px 14px 20px;}
   .cta{flex:1; text-align:center; padding:12px 8px; border-radius:14px; font-size:12.5px; font-weight:700; text-decoration:none;}
@@ -34393,9 +34392,9 @@ const contactosPodasHTML = `
   <p>Las podas de mediano y gran porte deberán ser retiradas por cada propietario, ya que este servicio no forma parte de las tareas habituales y comprometidas por el Club.</p>
   <p>A modo meramente colaborativo, compartimos algunos contactos de prestadores que realizan este tipo de trabajos:</p>
   <div class="contactos">
-    <a class="contacto-btn" href="https://wa.me/5493765121797" target="_blank" rel="noopener"><span>Sr. Félix</span><span class="ir">WhatsApp <span class="flecha">➜</span>📱</span></a>
-    <a class="contacto-btn" href="https://wa.me/5493764726485" target="_blank" rel="noopener"><span>Sr. Patiño</span><span class="ir">WhatsApp <span class="flecha">➜</span>📱</span></a>
-    <a class="contacto-btn" href="https://wa.me/5493764889851" target="_blank" rel="noopener"><span>Sr. Aquino</span><span class="ir">WhatsApp <span class="flecha">➜</span>📱</span></a>
+    <a class="contacto-btn" href="https://wa.me/5493765121797" target="_blank" rel="noopener"><span>Sr. Félix</span><span class="ir">WhatsApp 📲</span></a>
+    <a class="contacto-btn" href="https://wa.me/5493764726485" target="_blank" rel="noopener"><span>Sr. Patiño</span><span class="ir">WhatsApp 📲</span></a>
+    <a class="contacto-btn" href="https://wa.me/5493764889851" target="_blank" rel="noopener"><span>Sr. Aquino</span><span class="ir">WhatsApp 📲</span></a>
   </div>
 `;
 function mostrarPodas(){
