@@ -24,12 +24,18 @@
          para no empujar el buscador/leyenda hacia abajo. ---- */
   /* ---- titulo: vuelve, roto en mayuscula (Anton, como el resto de
          titulos de la app), SIN el logo -- el logo ahora vive en la
-         fila del buscador. ---- */
-  .titulo-wrap{ padding:16px 16px 0; text-align:center; }
+         fila del buscador. Colapsable: cuando se abre un card, se
+         esconde y los 3 botones de zona quedan como techo del mapa. ---- */
+  .titulo-wrap{
+    padding:16px 16px 0; text-align:center;
+    max-height:120px; opacity:1; overflow:hidden;
+    transition:max-height .3s ease, opacity .25s ease, padding .3s ease;
+  }
+  .titulo-wrap.oculto{ max-height:0; opacity:0; padding-top:0; padding-bottom:0; }
   .titulo-wrap h1{
     color:var(--hueso); font-family:'Anton',Impact,sans-serif; font-weight:400;
-    font-size:26px; line-height:.95; text-transform:uppercase; margin:0;
-    text-shadow:0 2px 6px rgba(0,0,0,.25);
+    font-size:20px; line-height:1; text-transform:uppercase; margin:0;
+    text-shadow:0 2px 6px rgba(0,0,0,.25); white-space:nowrap;
   }
   .titulo-wrap p{ color:var(--verdecl); font-size:12.5px; margin:8px auto 0; max-width:480px; line-height:1.5; }
 
@@ -45,15 +51,9 @@
   }
   .pin-btn:active, .pin-btn.open{ opacity:1; background:#fff; transform:scale(1.08); }
   #menuLogoIcon{ width:30px; height:30px; pointer-events:none; }
-  /* puntito que indica que el logo es tappable */
-  .pin-btn::after{
-    content:''; position:absolute; width:9px; height:9px; border-radius:50%;
-    background:var(--naranja); border:2px solid var(--petroleo);
-    transform:translate(15px,-15px);
-  }
 
   .destinos-menu{
-    position:absolute; top:58px; left:0; z-index:70;
+    position:absolute; top:80px; left:0; z-index:70;
     display:flex; flex-direction:column; gap:8px;
     max-height:0; overflow:hidden; opacity:0; transform:translateY(-8px);
     transition:max-height .3s cubic-bezier(.22,.9,.3,1), opacity .22s ease, transform .28s cubic-bezier(.22,.9,.3,1);
@@ -88,7 +88,7 @@
   .legend button .letras{ font-weight:400; font-size:10px; opacity:.8; }
 
   .search-wrap{ margin:0; flex:1; min-width:0; }
-  .search-box{display:flex; align-items:center; gap:8px; background:rgba(255,255,255,.4); border:1px solid rgba(255,255,255,.5); border-radius:16px; padding:11px 16px; box-shadow:0 4px 14px rgba(0,0,0,.25), inset 0 1px 1px rgba(255,255,255,.6); transition:background .25s ease, transform .25s cubic-bezier(.34,1.56,.64,1);}
+  .search-box{display:flex; align-items:center; gap:8px; background:rgba(255,255,255,.4); border:1px solid rgba(255,255,255,.5); border-radius:16px; height:50px; padding:0 16px; box-sizing:border-box; box-shadow:0 4px 14px rgba(0,0,0,.25), inset 0 1px 1px rgba(255,255,255,.6); transition:background .25s ease, transform .25s cubic-bezier(.34,1.56,.64,1);}
   .search-box svg{ stroke:#fff; flex-shrink:0; transition:stroke .25s ease; }
   .search-box input{border:none; outline:none; flex:1; font-size:16px; color:#fff; background:transparent; transition:color .25s ease;}
   .search-box input::placeholder{ color:rgba(255,255,255,.85); }
@@ -113,22 +113,22 @@
          mapa, mismo tamaño que antes pero en flujo normal, no flotando
          encima del plano. ---- */
   .map-zoom-controls{
-    display:flex; align-items:center; justify-content:center; gap:10px;
+    display:flex; align-items:center; justify-content:flex-end; gap:10px;
     margin:10px 14px 0;
   }
   .map-zoom-controls button{
-    width:44px; height:44px; border-radius:50%; border:1px solid rgba(255,255,255,.4);
-    background:rgba(255,255,255,.22); color:var(--hueso); font-size:22px; font-weight:700;
+    width:44px; height:44px; border-radius:50%; border:1px solid rgba(255,255,255,.25);
+    background:var(--petroleo); color:var(--hueso); font-size:22px; font-weight:700;
     display:flex; align-items:center; justify-content:center; padding:0; line-height:1;
-    box-shadow:0 3px 10px rgba(0,0,0,.3); backdrop-filter:blur(4px); cursor:pointer;
+    box-shadow:0 3px 10px rgba(0,0,0,.3); cursor:pointer;
     transition:background .2s ease, transform .18s cubic-bezier(.34,1.56,.64,1);
   }
-  .map-zoom-controls button:active{ transform:scale(.92); background:rgba(255,255,255,.4); }
+  .map-zoom-controls button:active{ transform:scale(.92); background:#0d4143; }
   .map-zoom-controls button.pildora-calles{
     width:auto; height:44px; border-radius:20px; font-size:12.5px; font-weight:700;
     padding:0 18px;
   }
-  .map-zoom-controls button.pildora-calles.active{ background:rgba(255,255,255,.94); color:var(--petroleo); }
+  .map-zoom-controls button.pildora-calles.active{ background:var(--hueso); color:var(--petroleo); }
 
   @keyframes pulseZona1{ 0%,100%{ fill:#00A650; } 50%{ fill:var(--zona1); } }
   @keyframes pulseZona2{ 0%,100%{ fill:#00A650; } 50%{ fill:var(--zona2); } }
@@ -186,7 +186,7 @@
 <body>
 
 <div class="titulo-wrap">
-  <h1>ZONAS DE<br>MANTENIMIENTO</h1>
+  <h1>ZONAS DE MANTENIMIENTO</h1>
   <p>La Eugenia divide el mantenimiento del barrio en 3 zonas.<br>Elegí la tuya o buscá tu lote.</p>
 </div>
 
@@ -34385,13 +34385,12 @@ const infoZonaHTML = (zona) => `
     <li>Corte rotativo de los lotes sin construcción.</li>
   </ul>
   <p class="nota">Nota: Las fechas de corte y recolección se informan previamente a través de <i>La Euge Informa</i> 📣 (en WhatsApp), de acuerdo con el cronograma establecido para cada zona por el área de Intendencia.</p>
-  <hr>
-  <p><b>¿Necesitás retirar podas medianas o grandes?</b><br>Conocé cómo gestionar este servicio de forma particular.</p>
-  <button class="btn-podas-inline" id="btnGrandesPodasInline" style="background:var(--zona${zona})">Grandes Podas</button>
 `;
 
-// Sube el mapa a la vista para que quede una franja tocable por encima del card
+// Sube el mapa a la vista para que quede una franja tocable por encima del card,
+// y esconde el titulo (los 3 botones de zona quedan como techo del mapa)
 function subirMapaALaVista(){
+  document.querySelector('.titulo-wrap').classList.add('oculto');
   const host = document.getElementById('mapHost');
   const y = host.getBoundingClientRect().top + window.scrollY - 10;
   window.scrollTo({top: Math.max(y,0), behavior:'smooth'});
@@ -34407,10 +34406,6 @@ function mostrarSheetZona(zona, loteId){
   if(window.resetAlturaSheet) window.resetAlturaSheet();
   document.getElementById('sheet').classList.add('show');
   subirMapaALaVista();
-  document.getElementById('btnGrandesPodasInline').addEventListener('click', (e)=>{
-    e.stopPropagation();
-    mostrarPodas();
-  });
 }
 
 function pulsarZona(zona, updateUrl){
@@ -34430,6 +34425,7 @@ function pulsarZona(zona, updateUrl){
 
 function cerrarSheet(){
   document.getElementById('sheet').classList.remove('show');
+  document.querySelector('.titulo-wrap').classList.remove('oculto');
   volverASolido();
   limpiarLoteSeleccionado();
   const url = new URL(location.href);
