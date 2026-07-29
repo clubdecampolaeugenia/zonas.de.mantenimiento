@@ -100,8 +100,15 @@
   .sheet .head .swatch{width:14px; height:14px; border-radius:4px; flex-shrink:0;}
   .sheet .head h3{margin:0; font-size:14.5px; color:var(--petroleo); flex:1;}
   .sheet .head button{background:none; border:none; color:var(--gris); font-size:13px; cursor:pointer;}
-  .sheet ul{margin:0 0 8px; padding-left:18px;}
+  .sheet p{font-size:12.5px; line-height:1.55; margin:0 0 10px; color:#243b3c;}
+  .sheet p.nota{font-size:11.5px; color:var(--gris); font-style:italic;}
+  .sheet ul{margin:0 0 10px; padding-left:18px;}
   .sheet li{font-size:12.5px; line-height:1.55; margin-bottom:4px; color:#243b3c;}
+  .sheet hr{border:none; border-top:1px solid #e2ddd0; margin:14px 0;}
+  .btn-podas-inline{
+    display:block; width:100%; background:var(--lima); color:var(--petroleo); border:none;
+    border-radius:12px; padding:12px; font-size:13px; font-weight:700; margin-top:10px; cursor:pointer;
+  }
   .contactos{display:flex; flex-direction:column; gap:6px; margin-top:6px;}
   .contacto-btn{display:flex; align-items:center; justify-content:space-between; background:#fff; border:1px solid #e2ddd0; border-radius:10px; padding:8px 10px; text-decoration:none; font-size:12.5px; color:var(--petroleo);}
   .contacto-btn .ir{background:var(--lima); color:var(--petroleo); font-size:10.5px; font-weight:700; padding:5px 9px; border-radius:8px;}
@@ -138,7 +145,7 @@
 
 <div id="sheet" class="sheet">
   <div class="handle"></div>
-  <div class="head"><span id="sheetSwatch" class="swatch"></span><h3 id="sheetTitulo">Zona</h3><button id="sheetClose" aria-label="Cerrar">✕</button></div>
+  <div class="head"><span id="sheetSwatch" class="swatch"></span><h3 id="sheetTitulo">Zona</h3></div>
   <div id="sheetBody"></div>
 </div>
 
@@ -34086,22 +34093,29 @@ function limpiarLoteSeleccionado(){
 }
 
 const infoZonaHTML = () => `
+  <p>En esta zona, el mantenimiento habitual se realiza con una frecuencia mensual y habitualmente comprende:</p>
   <ul>
-    <li>Levantamiento de podas y ponchadas por rondas rotativas — se avisa por WhatsApp en <i>La Euge Informa</i>.</li>
-    <li>Corte de césped en espacios comunes y banquinas del sector.</li>
-    <li>Ponchadas en venta en garita; agilizan el retiro si están colocadas en ellas.</li>
-    <li>Podas que superen un cachapé se coordinan de forma particular.</li>
+    <li>Recolección de residuos verdes depositados en ponchadas.</li>
+    <li>Corte rotativo de los lotes sin construcción.</li>
   </ul>
+  <p class="nota">Nota: Las fechas de corte y recolección se informan previamente a través de <i>La Euge Informa</i> 📣 (en WhatsApp), de acuerdo con el cronograma establecido para cada zona por el área de Intendencia.</p>
+  <hr>
+  <p><b>¿Necesitás retirar podas medianas o grandes?</b><br>Conocé cómo gestionar este servicio de forma particular.</p>
+  <button class="btn-podas-inline" id="btnGrandesPodasInline">Grandes Podas</button>
 `;
 
 function mostrarSheetZona(zona, loteId){
   const titulo = loteId
-    ? 'El lote ' + loteId + ' está dentro de la ' + ZONA_NOMBRE[zona]
+    ? 'El lote ' + loteId + ' pertenece a la ' + ZONA_NOMBRE[zona] + '.'
     : ZONA_NOMBRE[zona];
   document.getElementById('sheetTitulo').textContent = titulo;
   document.getElementById('sheetSwatch').style.background = 'var(--zona'+zona+')';
   document.getElementById('sheetBody').innerHTML = infoZonaHTML();
   document.getElementById('sheet').classList.add('show');
+  document.getElementById('btnGrandesPodasInline').addEventListener('click', (e)=>{
+    e.stopPropagation();
+    mostrarPodas();
+  });
 }
 
 function pulsarZona(zona, updateUrl){
@@ -34119,14 +34133,14 @@ function pulsarZona(zona, updateUrl){
   }
 }
 
-document.getElementById('sheetClose').addEventListener('click', ()=>{
+function cerrarSheet(){
   document.getElementById('sheet').classList.remove('show');
   volverASolido();
   limpiarLoteSeleccionado();
   const url = new URL(location.href);
   url.searchParams.delete('zona'); url.searchParams.delete('lote');
   history.replaceState(null,'',url);
-});
+}
 
 document.querySelectorAll('.legend button').forEach(btn=>{
   btn.addEventListener('click', ()=>{
@@ -34165,7 +34179,7 @@ function irALote(id, updateUrl){
 
 // Tocar el card levantado lo cierra
 document.getElementById('sheet').addEventListener('click', ()=>{
-  document.getElementById('sheetClose').click();
+  cerrarSheet();
 });
 
 // Tocar fuera del card (y fuera de lo que ya abre su propio card) tambien lo cierra
@@ -34174,13 +34188,13 @@ document.addEventListener('click', (e)=>{
   if(!sheet.classList.contains('show')) return;
   const esControlPropio = e.target.closest('#sheet, .legend button, #btnPodasGrandes, .suggestion-item, #searchInput');
   if(esControlPropio) return;
-  document.getElementById('sheetClose').click();
+  cerrarSheet();
 });
 
 // Activar el buscador cierra cualquier card abierto
 document.getElementById('searchInput').addEventListener('focus', ()=>{
   const sheet = document.getElementById('sheet');
-  if(sheet.classList.contains('show')) document.getElementById('sheetClose').click();
+  if(sheet.classList.contains('show')) cerrarSheet();
 });
 
 const input = document.getElementById('searchInput');
@@ -34209,20 +34223,24 @@ input.addEventListener('keydown', (e)=>{
 });
 
 const contactosPodasHTML = `
+  <p><b>PODAS MEDIANAS Y GRANDES</b></p>
+  <p>Las podas de mediano y gran porte deberán ser retiradas por cada propietario, ya que este servicio no forma parte de las tareas habituales y comprometidas por el Club.</p>
+  <p>A modo meramente colaborativo, compartimos algunos contactos de prestadores que realizan este tipo de trabajos:</p>
   <div class="contactos">
-    <a class="contacto-btn" href="https://wa.me/5493765121797" target="_blank" rel="noopener"><span>Sr. Félix</span><span class="ir">WhatsApp</span></a>
-    <a class="contacto-btn" href="https://wa.me/5493764726485" target="_blank" rel="noopener"><span>Sr. Patiño</span><span class="ir">WhatsApp</span></a>
-    <a class="contacto-btn" href="https://wa.me/5493764889851" target="_blank" rel="noopener"><span>Sr. Aquino</span><span class="ir">WhatsApp</span></a>
+    <a class="contacto-btn" href="https://wa.me/5493765121797" target="_blank" rel="noopener"><span>Sr. Félix</span><span class="ir">WhatsApp 📲</span></a>
+    <a class="contacto-btn" href="https://wa.me/5493764726485" target="_blank" rel="noopener"><span>Sr. Patiño</span><span class="ir">WhatsApp 📲</span></a>
+    <a class="contacto-btn" href="https://wa.me/5493764889851" target="_blank" rel="noopener"><span>Sr. Aquino</span><span class="ir">WhatsApp 📲</span></a>
   </div>
 `;
-document.getElementById('btnPodasGrandes').addEventListener('click', ()=>{
+function mostrarPodas(){
   limpiarLoteSeleccionado();
   apagarZonas();
-  document.getElementById('sheetTitulo').textContent = 'Podas grandes — retiro particular';
+  document.getElementById('sheetTitulo').textContent = 'Podas medianas y grandes';
   document.getElementById('sheetSwatch').style.background = 'var(--naranja)';
   document.getElementById('sheetBody').innerHTML = contactosPodasHTML;
   document.getElementById('sheet').classList.add('show');
-});
+}
+document.getElementById('btnPodasGrandes').addEventListener('click', mostrarPodas);
 
 // Animacion de bienvenida: las 3 zonas pulsan juntas 2 segundos y se apagan
 let bienvenidaTimeout = null;
