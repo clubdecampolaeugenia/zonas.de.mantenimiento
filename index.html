@@ -101,8 +101,8 @@
   .sheet.show{ transform:translateY(0); opacity:1; pointer-events:auto; }
   .sheet .handle{width:44px; height:5px; background:rgba(19,84,87,.45); border-radius:4px; margin:0 auto; padding:14px 0 12px; background-clip:content-box; touch-action:none;}
   .sheet .head{display:flex; align-items:center; gap:10px; margin-bottom:14px;}
-  .sheet .head .swatch{width:14px; height:14px; border-radius:4px; flex-shrink:0; overflow:hidden;}
-  .sheet .head .swatch:has(span){width:18px; border-radius:2px;}
+  .sheet .head .swatch{width:14px; height:14px; border-radius:4px; flex-shrink:0;}
+  .sheet .head .swatch:has(span){width:auto; display:flex; gap:4px; border-radius:0;}
   .sheet .head h3{margin:0; font-family:'Anton',Impact,sans-serif; font-weight:400; font-size:16px; text-transform:uppercase; color:var(--petroleo); flex:1; line-height:1.2;}
   .sheet .head button{background:none; border:none; color:var(--gris); font-size:13px; cursor:pointer;}
   .sheet p{font-size:13px; line-height:1.5; margin:0 0 10px; color:var(--petroleo);}
@@ -34417,9 +34417,9 @@ function mostrarPodas(){
   document.getElementById('sheetTitulo').textContent = 'Podas medianas y grandes';
   document.getElementById('sheetSwatch').style.background = 'transparent';
   document.getElementById('sheetSwatch').innerHTML =
-    '<span style="display:block;width:6px;height:14px;background:var(--zona1);float:left;border-radius:2px 0 0 2px;"></span>'+
-    '<span style="display:block;width:6px;height:14px;background:var(--zona2);float:left;"></span>'+
-    '<span style="display:block;width:6px;height:14px;background:var(--zona3);float:left;border-radius:0 2px 2px 0;"></span>';
+    '<span style="display:block;width:14px;height:14px;background:var(--zona3);border-radius:4px;"></span>'+
+    '<span style="display:block;width:14px;height:14px;background:var(--zona2);border-radius:4px;"></span>'+
+    '<span style="display:block;width:14px;height:14px;background:var(--zona1);border-radius:4px;"></span>';
   document.getElementById('sheetBody').innerHTML = contactosPodasHTML;
   if(window.resetAlturaSheet) window.resetAlturaSheet();
   document.getElementById('sheet').classList.add('show');
