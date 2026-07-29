@@ -109,12 +109,12 @@
   #realSvg #CALLES{ display:none; }
   .street-label{ fill:#ffffff; font-family:'Roboto',Arial,sans-serif; text-anchor:middle; pointer-events:none; }
 
-  /* ---- controles de zoom (+/-) y pildora "Calles" flotando DENTRO del
-         mapa, esquina inferior derecha -- mismo lenguaje visual (glass)
-         que los otros mapas del ecosistema. ---- */
+  /* ---- controles de zoom (+/-) y pildora "Calles": fila debajo del
+         mapa, mismo tamaño que antes pero en flujo normal, no flotando
+         encima del plano. ---- */
   .map-zoom-controls{
-    position:absolute; right:12px; bottom:14px; z-index:20;
-    display:flex; flex-direction:column; align-items:center; gap:10px;
+    display:flex; align-items:center; justify-content:center; gap:10px;
+    margin:10px 14px 0;
   }
   .map-zoom-controls button{
     width:44px; height:44px; border-radius:50%; border:1px solid rgba(255,255,255,.4);
@@ -125,8 +125,8 @@
   }
   .map-zoom-controls button:active{ transform:scale(.92); background:rgba(255,255,255,.4); }
   .map-zoom-controls button.pildora-calles{
-    width:auto; height:auto; border-radius:20px; font-size:12.5px; font-weight:700;
-    padding:9px 18px;
+    width:auto; height:44px; border-radius:20px; font-size:12.5px; font-weight:700;
+    padding:0 18px;
   }
   .map-zoom-controls button.pildora-calles.active{ background:rgba(255,255,255,.94); color:var(--petroleo); }
 
@@ -34115,12 +34115,12 @@ AAAAAAAAAAAAAAAAAAAAAAAAgEj/BEfDIS5Jha1kAAAAAElFTkSuQmCC" transform="matrix(6.86
 </g>
 </svg>
 
-<div class="map-zoom-controls">
-  <button id="btnZoomIn" aria-label="Acercar">+</button>
-  <button id="btnZoomOut" aria-label="Alejar">−</button>
-  <button id="btnVerCalles" class="pildora-calles">Calles</button>
 </div>
 
+<div class="map-zoom-controls">
+  <button id="btnVerCalles" class="pildora-calles">Calles</button>
+  <button id="btnZoomOut" aria-label="Alejar">−</button>
+  <button id="btnZoomIn" aria-label="Acercar">+</button>
 </div>
 
 <script>
