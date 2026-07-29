@@ -58,7 +58,7 @@
   .suggestion-item span{font-size:11px; font-weight:700; padding:3px 8px; border-radius:8px; color:#fff;}
 
   #mapHost{ margin:14px 10px 0; border-radius:16px; overflow:hidden; background:#0f3f42; box-shadow:0 6px 18px rgba(0,0,0,.3); touch-action:none; position:relative; }
-  #mapHost svg{ width:100%; height:auto; display:block; transform-origin:0 0; will-change:transform; }
+  #mapHost svg{ width:100%; height:auto; display:block; }
   #realSvg #CALLES{ display:none; }
   .street-label{ fill:#ffffff; font-family:'Roboto',Arial,sans-serif; text-anchor:middle; pointer-events:none; }
 
@@ -33954,60 +33954,75 @@ AAAAAAAAAAAAAAAAAAAAAAAAgEj/BEfDIS5Jha1kAAAAAElFTkSuQmCC" transform="matrix(6.86
 </div>
 
 <script>
-// --- Zoom propio del mapa (pinch), sin zoomear el resto de la pagina ---
+// --- Zoom propio del mapa (pinch), manipulando el viewBox real del SVG ---
+// (no usa transform:scale porque en Safari eso rasteriza el SVG y se pixela al agrandar)
 (function(){
   const host = document.getElementById('mapHost');
   const svgEl = document.getElementById('realSvg');
-  let scale = 1, tx = 0, ty = 0;
-  let pinchStartDist = 0, pinchStartScale = 1;
-  let panStartX = 0, panStartY = 0, panStartTx = 0, panStartTy = 0, panning = false;
+  const BASE = {x:0, y:0, w:568.9, h:319.7};
+  let vb = {x:0, y:0, w:568.9, h:319.7};
+  let scale = 1;
+  let pinchStartDist = 0, pinchStartVb = null;
+  let panStartX = 0, panStartY = 0, panStartVb = null, panning = false;
   const MIN_SCALE = 1, MAX_SCALE = 4;
 
   function aplicar(){
-    svgEl.style.transform = 'translate('+tx+'px,'+ty+'px) scale('+scale+')';
+    svgEl.setAttribute('viewBox', vb.x+' '+vb.y+' '+vb.w+' '+vb.h);
   }
 
   function limitar(){
-    const r = host.getBoundingClientRect();
-    const maxTx = 0, minTx = -(r.width*scale - r.width);
-    const maxTy = 0, minTy = -(r.height*scale - r.height);
-    tx = Math.min(maxTx, Math.max(minTx, tx));
-    ty = Math.min(maxTy, Math.max(minTy, ty));
+    vb.w = Math.min(BASE.w, Math.max(BASE.w/MAX_SCALE, vb.w));
+    vb.h = Math.min(BASE.h, Math.max(BASE.h/MAX_SCALE, vb.h));
+    vb.x = Math.min(BASE.x + (BASE.w - vb.w), Math.max(BASE.x, vb.x));
+    vb.y = Math.min(BASE.y + (BASE.h - vb.h), Math.max(BASE.y, vb.y));
   }
 
   function distancia(t0, t1){
     return Math.hypot(t1.clientX - t0.clientX, t1.clientY - t0.clientY);
   }
 
+  // convierte un punto de pantalla (relativo al host) a coordenadas del viewBox actual
+  function puntoSvg(px, py, r, base){
+    return {
+      x: base.x + (px / r.width) * base.w,
+      y: base.y + (py / r.height) * base.h,
+    };
+  }
+
   host.addEventListener('touchstart', (e)=>{
     if(e.touches.length === 2){
       pinchStartDist = distancia(e.touches[0], e.touches[1]);
-      pinchStartScale = scale;
+      pinchStartVb = {x:vb.x, y:vb.y, w:vb.w, h:vb.h};
       panning = false;
     } else if(e.touches.length === 1 && scale > 1){
       panning = true;
       panStartX = e.touches[0].clientX; panStartY = e.touches[0].clientY;
-      panStartTx = tx; panStartTy = ty;
+      panStartVb = {x:vb.x, y:vb.y};
     }
   }, {passive:true});
 
   host.addEventListener('touchmove', (e)=>{
+    const r = host.getBoundingClientRect();
     if(e.touches.length === 2){
       e.preventDefault();
-      const r = host.getBoundingClientRect();
       const dist = distancia(e.touches[0], e.touches[1]);
-      const nuevaScale = Math.min(MAX_SCALE, Math.max(MIN_SCALE, pinchStartScale * (dist / pinchStartDist)));
-      const midX = (e.touches[0].clientX + e.touches[1].clientX)/2 - r.left;
-      const midY = (e.touches[0].clientY + e.touches[1].clientY)/2 - r.top;
-      tx = midX - (midX - tx) * (nuevaScale/scale);
-      ty = midY - (midY - ty) * (nuevaScale/scale);
+      const nuevaScale = Math.min(MAX_SCALE, Math.max(MIN_SCALE, (pinchStartVb.w ? BASE.w/pinchStartVb.w : 1) * (dist / pinchStartDist)));
+      const midPx = (e.touches[0].clientX + e.touches[1].clientX)/2 - r.left;
+      const midPy = (e.touches[0].clientY + e.touches[1].clientY)/2 - r.top;
+      const centro = puntoSvg(midPx, midPy, r, pinchStartVb);
+      const nuevoW = BASE.w / nuevaScale, nuevoH = BASE.h / nuevaScale;
+      vb.w = nuevoW; vb.h = nuevoH;
+      vb.x = centro.x - (midPx / r.width) * nuevoW;
+      vb.y = centro.y - (midPy / r.height) * nuevoH;
       scale = nuevaScale;
       limitar();
       aplicar();
     } else if(e.touches.length === 1 && panning){
       e.preventDefault();
-      tx = panStartTx + (e.touches[0].clientX - panStartX);
-      ty = panStartTy + (e.touches[0].clientY - panStartY);
+      const dxPx = e.touches[0].clientX - panStartX;
+      const dyPx = e.touches[0].clientY - panStartY;
+      vb.x = panStartVb.x - (dxPx / r.width) * vb.w;
+      vb.y = panStartVb.y - (dyPx / r.height) * vb.h;
       limitar();
       aplicar();
     }
@@ -34022,7 +34037,7 @@ AAAAAAAAAAAAAAAAAAAAAAAAgEj/BEfDIS5Jha1kAAAAAElFTkSuQmCC" transform="matrix(6.86
   host.addEventListener('touchend', (e)=>{
     const now = Date.now();
     if(now - lastTap < 300 && scale > 1){
-      scale = 1; tx = 0; ty = 0; aplicar();
+      scale = 1; vb = {x:BASE.x, y:BASE.y, w:BASE.w, h:BASE.h}; aplicar();
     }
     lastTap = now;
   });
