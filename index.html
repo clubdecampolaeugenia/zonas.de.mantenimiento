@@ -21,6 +21,8 @@
   header .logo-row{display:flex; align-items:center; justify-content:center; gap:8px;}
   header h1{color:var(--hueso); font-size:18px; margin:0; font-weight:700;}
   header p{color:var(--verdecl); font-size:12.5px; margin:5px auto 0; max-width:480px; line-height:1.5;}
+  header{ max-height:120px; opacity:1; overflow:hidden; transition:max-height .3s ease, opacity .25s ease, padding .3s ease; }
+  header.oculto{ max-height:0; opacity:0; padding-top:0; padding-bottom:0; }
   #menuLogoIcon{ width:22px; height:22px; }
 
   .legend{display:flex; gap:8px; margin:12px 14px 0;}
@@ -86,15 +88,16 @@
   .lote-seleccionado.lz3{ fill:var(--zona3) !important; }
 
   .sheet{
-    position:fixed; left:14px; right:14px; bottom:calc(14px + env(safe-area-inset-bottom)); z-index:80;
-    background:rgba(255,255,255,.95); border:1px solid rgba(255,255,255,.5);
-    color:var(--petroleo); border-radius:20px;
-    padding:14px 18px; backdrop-filter:blur(10px);
-    box-shadow:0 8px 24px rgba(0,0,0,.35), inset 0 1px 1px rgba(255,255,255,.6);
-    max-height:52vh; overflow-y:auto; -webkit-overflow-scrolling:touch;
+    position:fixed; left:14px; right:14px; bottom:0; z-index:80;
+    background:rgba(255,255,255,.95); border:1px solid rgba(255,255,255,.5); border-bottom:none;
+    color:var(--petroleo); border-radius:20px 20px 0 0;
+    padding:14px 18px calc(16px + env(safe-area-inset-bottom)); backdrop-filter:blur(10px);
+    box-shadow:0 -8px 24px rgba(0,0,0,.35), inset 0 1px 1px rgba(255,255,255,.6);
+    height:52vh; max-height:52vh; overflow-y:auto; -webkit-overflow-scrolling:touch;
     transform:translateY(120%); opacity:0; pointer-events:none;
-    transition:transform .32s cubic-bezier(.22,.9,.3,1), opacity .28s ease;
+    transition:transform .32s cubic-bezier(.22,.9,.3,1), opacity .28s ease, height .28s cubic-bezier(.22,.9,.3,1);
   }
+  .sheet.dragging{ transition:opacity .28s ease; }
   .sheet.show{ transform:translateY(0); opacity:1; pointer-events:auto; }
   .sheet .handle{width:38px; height:4px; background:rgba(19,84,87,.25); border-radius:4px; margin:0 auto 12px;}
   .sheet .head{display:flex; align-items:center; gap:10px; margin-bottom:6px;}
@@ -34200,7 +34203,9 @@ function mostrarSheetZona(zona, loteId){
   document.getElementById('sheetTitulo').textContent = titulo;
   document.getElementById('sheetSwatch').style.background = 'var(--zona'+zona+')';
   document.getElementById('sheetBody').innerHTML = infoZonaHTML(zona);
+  if(window.resetAlturaSheet) window.resetAlturaSheet();
   document.getElementById('sheet').classList.add('show');
+  document.querySelector('header').classList.add('oculto');
   subirMapaALaVista();
   document.getElementById('btnGrandesPodasInline').addEventListener('click', (e)=>{
     e.stopPropagation();
@@ -34225,6 +34230,7 @@ function pulsarZona(zona, updateUrl){
 
 function cerrarSheet(){
   document.getElementById('sheet').classList.remove('show');
+  document.querySelector('header').classList.remove('oculto');
   volverASolido();
   limpiarLoteSeleccionado();
   const url = new URL(location.href);
@@ -34267,8 +34273,63 @@ function irALote(id, updateUrl){
   }
 }
 
+// Arrastre del card: se puede reducir a la mitad (para ver el mapa detras)
+// sin cerrarlo del todo, arrastrando desde la agarradera.
+(function(){
+  const sheet = document.getElementById('sheet');
+  const handle = sheet.querySelector('.handle');
+  const EXPANDIDA = 52, COLAPSADA = 28, CIERRE = 14; // en vh
+  let startY = 0, startHeightVh = EXPANDIDA, arrastrando = false, huboMovimiento = false;
+
+  function vh(px){ return (px / window.innerHeight) * 100; }
+
+  handle.addEventListener('touchstart', (e)=>{
+    startY = e.touches[0].clientY;
+    startHeightVh = vh(sheet.getBoundingClientRect().height);
+    arrastrando = true; huboMovimiento = false;
+    sheet.classList.add('dragging');
+  }, {passive:true});
+
+  handle.addEventListener('touchmove', (e)=>{
+    if(!arrastrando) return;
+    const deltaY = startY - e.touches[0].clientY;
+    if(Math.abs(deltaY) > 6) huboMovimiento = true;
+    let nueva = startHeightVh + vh(deltaY);
+    nueva = Math.max(CIERRE, Math.min(EXPANDIDA, nueva));
+    sheet.style.height = nueva + 'vh';
+  }, {passive:true});
+
+  handle.addEventListener('touchend', ()=>{
+    if(!arrastrando) return;
+    arrastrando = false;
+    sheet.classList.remove('dragging');
+    const alturaActual = vh(sheet.getBoundingClientRect().height);
+    if(!huboMovimiento){
+      // fue un toque, no un arrastre: se cierra como el resto del card
+      cerrarSheet();
+      return;
+    }
+    if(alturaActual < (COLAPSADA + CIERRE)/2){
+      cerrarSheet();
+    } else if(alturaActual < (EXPANDIDA + COLAPSADA)/2){
+      sheet.style.height = COLAPSADA + 'vh';
+    } else {
+      sheet.style.height = EXPANDIDA + 'vh';
+    }
+    // evita que el toque de arrastre tambien dispare el cierre por click
+    sheet.dataset.recienArrastrado = '1';
+    setTimeout(()=>{ delete sheet.dataset.recienArrastrado; }, 350);
+  });
+
+  // cada vez que se abre un card nuevo, vuelve a su altura expandida
+  window.resetAlturaSheet = function(){
+    sheet.style.height = EXPANDIDA + 'vh';
+  };
+})();
+
 // Tocar el card levantado lo cierra
 document.getElementById('sheet').addEventListener('click', ()=>{
+  if(document.getElementById('sheet').dataset.recienArrastrado) return;
   cerrarSheet();
 });
 
@@ -34328,7 +34389,9 @@ function mostrarPodas(){
   document.getElementById('sheetTitulo').textContent = 'Podas medianas y grandes';
   document.getElementById('sheetSwatch').style.background = 'transparent';
   document.getElementById('sheetBody').innerHTML = contactosPodasHTML;
+  if(window.resetAlturaSheet) window.resetAlturaSheet();
   document.getElementById('sheet').classList.add('show');
+  document.querySelector('header').classList.add('oculto');
   subirMapaALaVista();
 }
 document.getElementById('btnPodasGrandes').addEventListener('click', mostrarPodas);
