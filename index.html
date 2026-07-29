@@ -89,9 +89,9 @@
 
   .sheet{
     position:fixed; left:14px; right:14px; bottom:0; z-index:80;
-    background:rgba(255,255,255,.95); border:1px solid rgba(255,255,255,.5); border-bottom:none;
-    color:var(--petroleo); border-radius:20px 20px 0 0;
-    padding:14px 18px calc(16px + env(safe-area-inset-bottom)); backdrop-filter:blur(10px);
+    background:linear-gradient(135deg, #eef3f2, #dbe4e2); border:1px solid rgba(255,255,255,.5); border-bottom:none;
+    color:var(--petroleo); border-radius:24px 24px 0 0;
+    padding:18px 22px calc(20px + env(safe-area-inset-bottom)); backdrop-filter:blur(10px);
     box-shadow:0 -8px 24px rgba(0,0,0,.35), inset 0 1px 1px rgba(255,255,255,.6);
     height:52vh; max-height:52vh; overflow-y:auto; -webkit-overflow-scrolling:touch;
     transform:translateY(120%); opacity:0; pointer-events:none;
@@ -100,22 +100,24 @@
   .sheet.dragging{ transition:opacity .28s ease; }
   .sheet.show{ transform:translateY(0); opacity:1; pointer-events:auto; }
   .sheet .handle{width:44px; height:5px; background:rgba(19,84,87,.45); border-radius:4px; margin:0 auto; padding:14px 0 12px; background-clip:content-box; touch-action:none;}
-  .sheet .head{display:flex; align-items:center; gap:10px; margin-bottom:6px;}
+  .sheet .head{display:flex; align-items:center; gap:10px; margin-bottom:14px;}
   .sheet .head .swatch{width:14px; height:14px; border-radius:4px; flex-shrink:0;}
-  .sheet .head h3{margin:0; font-size:14.5px; color:var(--petroleo); flex:1;}
+  .sheet .head h3{margin:0; font-size:21px; font-weight:900; text-transform:uppercase; letter-spacing:.01em; color:var(--petroleo); flex:1; line-height:1.15;}
   .sheet .head button{background:none; border:none; color:var(--gris); font-size:13px; cursor:pointer;}
-  .sheet p{font-size:12.5px; line-height:1.55; margin:0 0 10px; color:#243b3c;}
-  .sheet p.nota{font-size:11.5px; color:var(--gris); font-style:italic;}
-  .sheet ul{margin:0 0 10px; padding-left:18px;}
-  .sheet li{font-size:12.5px; line-height:1.55; margin-bottom:4px; color:#243b3c;}
+  .sheet p{font-size:15px; line-height:1.6; margin:0 0 14px; color:#1c3335;}
+  .sheet p.nota{font-size:13px; color:var(--gris); font-style:italic;}
+  .sheet ul{margin:0 0 14px; padding-left:20px;}
+  .sheet li{font-size:15px; line-height:1.6; margin-bottom:6px; color:#1c3335;}
   .sheet hr{border:none; border-top:1px solid #e2ddd0; margin:14px 0;}
   .btn-podas-inline{
     display:block; width:100%; color:var(--petroleo); border:none;
     border-radius:12px; padding:12px; font-size:13px; font-weight:700; margin-top:10px; cursor:pointer;
   }
-  .contactos{display:flex; flex-direction:column; gap:6px; margin-top:6px;}
-  .contacto-btn{display:flex; align-items:center; justify-content:space-between; background:#2f7ea3; border:none; border-radius:10px; padding:10px 12px; text-decoration:none; font-size:12.5px; font-weight:700; color:var(--hueso);}
-  .contacto-btn .ir{background:rgba(255,255,255,.2); color:var(--hueso); font-size:10.5px; font-weight:700; padding:5px 9px; border-radius:8px;}
+  .contactos{display:flex; flex-direction:column; margin-top:4px;}
+  .contacto-btn{display:flex; align-items:center; justify-content:space-between; text-decoration:none; font-size:15px; font-weight:700; color:#1c3335; padding:14px 0; border-bottom:1px solid rgba(19,84,87,.15);}
+  .contacto-btn:last-child{border-bottom:none;}
+  .contacto-btn .ir{color:var(--petroleo); font-size:15px; font-weight:700; display:flex; align-items:center; gap:4px;}
+  .contacto-btn .ir .flecha{color:#2f7ea3;}
 
   .cta-row{display:flex; gap:10px; margin:16px 14px 20px;}
   .cta{flex:1; text-align:center; padding:12px 8px; border-radius:14px; font-size:12.5px; font-weight:700; text-decoration:none;}
@@ -34192,7 +34194,8 @@ function limpiarLoteSeleccionado(){
   }
 }
 
-const infoZonaHTML = (zona) => `
+const infoZonaHTML = (zona, loteId) => `
+  ${loteId ? '<p><b>El lote '+loteId+' pertenece a la '+ZONA_NOMBRE[zona]+'.</b></p>' : ''}
   <p>En esta zona, el mantenimiento habitual se realiza con una frecuencia mensual y habitualmente comprende:</p>
   <ul>
     <li>Recolección de residuos verdes depositados en ponchadas.</li>
@@ -34212,12 +34215,9 @@ function subirMapaALaVista(){
 }
 
 function mostrarSheetZona(zona, loteId){
-  const titulo = loteId
-    ? 'El lote ' + loteId + ' pertenece a la ' + ZONA_NOMBRE[zona] + '.'
-    : ZONA_NOMBRE[zona];
-  document.getElementById('sheetTitulo').textContent = titulo;
+  document.getElementById('sheetTitulo').textContent = ZONA_NOMBRE[zona];
   document.getElementById('sheetSwatch').style.background = 'var(--zona'+zona+')';
-  document.getElementById('sheetBody').innerHTML = infoZonaHTML(zona);
+  document.getElementById('sheetBody').innerHTML = infoZonaHTML(zona, loteId);
   if(window.resetAlturaSheet) window.resetAlturaSheet();
   document.getElementById('sheet').classList.add('show');
   document.querySelector('header').classList.add('oculto');
@@ -34390,13 +34390,12 @@ input.addEventListener('keydown', (e)=>{
 });
 
 const contactosPodasHTML = `
-  <p><b>PODAS MEDIANAS Y GRANDES</b></p>
   <p>Las podas de mediano y gran porte deberán ser retiradas por cada propietario, ya que este servicio no forma parte de las tareas habituales y comprometidas por el Club.</p>
   <p>A modo meramente colaborativo, compartimos algunos contactos de prestadores que realizan este tipo de trabajos:</p>
   <div class="contactos">
-    <a class="contacto-btn" href="https://wa.me/5493765121797" target="_blank" rel="noopener"><span>Sr. Félix</span><span class="ir">WhatsApp 📲</span></a>
-    <a class="contacto-btn" href="https://wa.me/5493764726485" target="_blank" rel="noopener"><span>Sr. Patiño</span><span class="ir">WhatsApp 📲</span></a>
-    <a class="contacto-btn" href="https://wa.me/5493764889851" target="_blank" rel="noopener"><span>Sr. Aquino</span><span class="ir">WhatsApp 📲</span></a>
+    <a class="contacto-btn" href="https://wa.me/5493765121797" target="_blank" rel="noopener"><span>Sr. Félix</span><span class="ir">WhatsApp <span class="flecha">➜</span>📱</span></a>
+    <a class="contacto-btn" href="https://wa.me/5493764726485" target="_blank" rel="noopener"><span>Sr. Patiño</span><span class="ir">WhatsApp <span class="flecha">➜</span>📱</span></a>
+    <a class="contacto-btn" href="https://wa.me/5493764889851" target="_blank" rel="noopener"><span>Sr. Aquino</span><span class="ir">WhatsApp <span class="flecha">➜</span>📱</span></a>
   </div>
 `;
 function mostrarPodas(){
