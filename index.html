@@ -34604,12 +34604,12 @@ function mostrarPodas(){
   subirMapaALaVista();
 }
 // --- Menú del logo (patrón pin-btn / destinos-menu, calcado de Mapa Operativo/Como Llegar) ---
-function abrirSheetGenerico(titulo, bodyHTML){
+function abrirSheetGenerico(titulo, bodyHTML, swatchHTML){
   limpiarLoteSeleccionado();
   apagarZonas();
   document.getElementById('sheetTitulo').textContent = titulo;
   document.getElementById('sheetSwatch').style.background = 'transparent';
-  document.getElementById('sheetSwatch').innerHTML = '';
+  document.getElementById('sheetSwatch').innerHTML = swatchHTML || '';
   document.getElementById('sheetBody').innerHTML = bodyHTML;
   if(window.resetAlturaSheet) window.resetAlturaSheet();
   document.getElementById('sheet').classList.add('show');
@@ -34638,7 +34638,10 @@ document.getElementById('btnResiduosVerdes').addEventListener('click', (e)=>{
     + '<p>El Club retira exclusivamente césped y pequeñas podas provenientes del mantenimiento habitual de los jardines.</p>'
     + '<p>Los residuos deberán depositarse en ponchadas, sin mezclarlos con residuos no biodegradables ni materiales inflamables.</p>'
     + '<p style="margin:0;">Se solicita no depositar residuos de poda o basura en terrenos baldíos.</p>';
-  abrirSheetGenerico('Recolección de residuos verdes', html);
+  const swatch = '<span style="display:block;width:14px;height:14px;background:var(--zona3);border-radius:4px;"></span>'
+    + '<span style="display:block;width:14px;height:14px;background:var(--zona2);border-radius:4px;"></span>'
+    + '<span style="display:block;width:14px;height:14px;background:var(--zona1);border-radius:4px;"></span>';
+  abrirSheetGenerico('Recolección de residuos verdes', html, swatch);
   destinosMenu.classList.remove('open'); btnLogoMenu.classList.remove('open');
 });
 
