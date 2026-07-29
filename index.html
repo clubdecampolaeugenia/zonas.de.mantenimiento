@@ -99,7 +99,7 @@
   }
   .sheet.dragging{ transition:opacity .28s ease; }
   .sheet.show{ transform:translateY(0); opacity:1; pointer-events:auto; }
-  .sheet .handle{width:38px; height:4px; background:rgba(19,84,87,.25); border-radius:4px; margin:0 auto 12px;}
+  .sheet .handle{width:60px; height:4px; background:rgba(19,84,87,.25); border-radius:4px; margin:0 auto; padding:14px 0 12px; background-clip:content-box; touch-action:none;}
   .sheet .head{display:flex; align-items:center; gap:10px; margin-bottom:6px;}
   .sheet .head .swatch{width:14px; height:14px; border-radius:4px; flex-shrink:0;}
   .sheet .head h3{margin:0; font-size:14.5px; color:var(--petroleo); flex:1;}
@@ -34292,12 +34292,13 @@ function irALote(id, updateUrl){
 
   handle.addEventListener('touchmove', (e)=>{
     if(!arrastrando) return;
+    e.preventDefault();
     const deltaY = startY - e.touches[0].clientY;
     if(Math.abs(deltaY) > 6) huboMovimiento = true;
     let nueva = startHeightVh + vh(deltaY);
     nueva = Math.max(CIERRE, Math.min(EXPANDIDA, nueva));
     sheet.style.height = nueva + 'vh';
-  }, {passive:true});
+  }, {passive:false});
 
   handle.addEventListener('touchend', ()=>{
     if(!arrastrando) return;
