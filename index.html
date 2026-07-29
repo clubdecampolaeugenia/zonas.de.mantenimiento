@@ -109,13 +109,26 @@
   #realSvg #CALLES{ display:none; }
   .street-label{ fill:#ffffff; font-family:'Roboto',Arial,sans-serif; text-anchor:middle; pointer-events:none; }
 
-  .map-controls{display:flex; gap:8px; margin:10px 14px 0;}
-  .map-controls button{
-    flex:1; border:1px solid rgba(255,255,255,.5); background:rgba(255,255,255,.16); color:var(--hueso);
-    font-size:12.5px; font-weight:700; padding:9px 10px; border-radius:12px; cursor:pointer;
-    transition:background .2s ease;
+  /* ---- controles de zoom (+/-) y pildora "Calles" flotando DENTRO del
+         mapa, esquina inferior derecha -- mismo lenguaje visual (glass)
+         que los otros mapas del ecosistema. ---- */
+  .map-zoom-controls{
+    position:absolute; right:12px; bottom:14px; z-index:20;
+    display:flex; flex-direction:column; align-items:center; gap:10px;
   }
-  .map-controls button.active{ background:rgba(255,255,255,.94); color:var(--petroleo); }
+  .map-zoom-controls button{
+    width:44px; height:44px; border-radius:50%; border:1px solid rgba(255,255,255,.4);
+    background:rgba(255,255,255,.22); color:var(--hueso); font-size:22px; font-weight:700;
+    display:flex; align-items:center; justify-content:center; padding:0; line-height:1;
+    box-shadow:0 3px 10px rgba(0,0,0,.3); backdrop-filter:blur(4px); cursor:pointer;
+    transition:background .2s ease, transform .18s cubic-bezier(.34,1.56,.64,1);
+  }
+  .map-zoom-controls button:active{ transform:scale(.92); background:rgba(255,255,255,.4); }
+  .map-zoom-controls button.pildora-calles{
+    width:auto; height:auto; border-radius:20px; font-size:12.5px; font-weight:700;
+    padding:9px 18px;
+  }
+  .map-zoom-controls button.pildora-calles.active{ background:rgba(255,255,255,.94); color:var(--petroleo); }
 
   @keyframes pulseZona1{ 0%,100%{ fill:#00A650; } 50%{ fill:var(--zona1); } }
   @keyframes pulseZona2{ 0%,100%{ fill:#00A650; } 50%{ fill:var(--zona2); } }
@@ -175,6 +188,12 @@
 <div class="titulo-wrap">
   <h1>ZONAS DE<br>MANTENIMIENTO</h1>
   <p>La Eugenia divide el mantenimiento del barrio en 3 zonas.<br>Elegí la tuya o buscá tu lote.</p>
+</div>
+
+<div class="legend">
+  <button class="lz3" data-zona="3"><span>Zona 3</span></button>
+  <button class="lz2" data-zona="2"><span>Zona 2</span></button>
+  <button class="lz1" data-zona="1"><span>Zona 1</span></button>
 </div>
 
 <div class="top-row">
@@ -298,11 +317,7 @@ l0.3,2.2H1147.4z"/></svg></span></button>
 </div>
 
 
-<div class="legend">
-  <button class="lz3" data-zona="3"><span>Zona 3</span></button>
-  <button class="lz2" data-zona="2"><span>Zona 2</span></button>
-  <button class="lz1" data-zona="1"><span>Zona 1</span></button>
-</div>
+
 
 
 
@@ -34100,10 +34115,12 @@ AAAAAAAAAAAAAAAAAAAAAAAAgEj/BEfDIS5Jha1kAAAAAElFTkSuQmCC" transform="matrix(6.86
 </g>
 </svg>
 
+<div class="map-zoom-controls">
+  <button id="btnZoomIn" aria-label="Acercar">+</button>
+  <button id="btnZoomOut" aria-label="Alejar">−</button>
+  <button id="btnVerCalles" class="pildora-calles">Calles</button>
 </div>
 
-<div class="map-controls">
-  <button id="btnVerCalles">Ver calles</button>
 </div>
 
 <script>
@@ -34194,6 +34211,22 @@ AAAAAAAAAAAAAAAAAAAAAAAAgEj/BEfDIS5Jha1kAAAAAElFTkSuQmCC" transform="matrix(6.86
     }
     lastTap = now;
   });
+
+  // Botones +/- : mismo paso de zoom que el pinch, pero centrado en el
+  // centro actual del viewBox (no hay punto de contacto que usar como foco).
+  function zoomStep(factor){
+    const nuevaScale = Math.min(MAX_SCALE, Math.max(MIN_SCALE, scale * factor));
+    if(nuevaScale === scale) return;
+    const cx = vb.x + vb.w/2, cy = vb.y + vb.h/2;
+    const nuevoW = BASE.w / nuevaScale, nuevoH = BASE.h / nuevaScale;
+    vb.w = nuevoW; vb.h = nuevoH;
+    vb.x = cx - nuevoW/2; vb.y = cy - nuevoH/2;
+    scale = nuevaScale;
+    limitar();
+    aplicar();
+  }
+  document.getElementById('btnZoomIn').addEventListener('click', ()=> zoomStep(1.4));
+  document.getElementById('btnZoomOut').addEventListener('click', ()=> zoomStep(1/1.4));
 })();
 
 // Bloquea el pellizco de zoom en el resto de la pagina (el mapa tiene el suyo propio)
