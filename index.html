@@ -99,7 +99,8 @@
   }
   .sheet.dragging{ transition:opacity .28s ease; }
   .sheet.show{ transform:translateY(0); opacity:1; pointer-events:auto; }
-  .sheet .handle{width:48px; height:6px; background:rgba(19,84,87,.65); border-radius:4px; margin:0 auto; padding:14px 0 12px; background-clip:content-box; touch-action:none; box-shadow:0 1px 1px rgba(255,255,255,.4);}
+  .sheet .handle-zone{width:100%; height:32px; display:flex; align-items:center; justify-content:center; touch-action:none; margin:-4px 0 4px;}
+  .sheet .handle{width:40px; height:4px; background:rgba(19,84,87,.5); border-radius:4px;}
   .sheet .head{display:flex; align-items:center; gap:10px; margin-bottom:14px;}
   .sheet .head .swatch{width:14px; height:14px; border-radius:4px; flex-shrink:0;}
   .sheet .head .swatch:has(span){width:auto; display:flex; gap:4px; border-radius:0;}
@@ -150,7 +151,7 @@
 </div>
 
 <div id="sheet" class="sheet">
-  <div class="handle"></div>
+  <div class="handle-zone"><div class="handle"></div></div>
   <div class="head"><span id="sheetSwatch" class="swatch"></span><h3 id="sheetTitulo">Zona</h3></div>
   <div id="sheetBody"></div>
 </div>
@@ -34295,7 +34296,7 @@ function irALote(id, updateUrl){
 // se toma del contenido real de cada card, no de un numero fijo.
 (function(){
   const sheet = document.getElementById('sheet');
-  const handle = sheet.querySelector('.handle');
+  const handle = sheet.querySelector('.handle-zone');
   const TOPE = 70, CIERRE = 14; // vh: tope maximo y umbral de cierre
   let alturaCompleta = TOPE;
   let startY = 0, startHeightVh = TOPE, arrastrando = false, huboMovimiento = false;
