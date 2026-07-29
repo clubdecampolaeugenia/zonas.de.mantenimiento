@@ -93,7 +93,7 @@
     color:var(--petroleo); border-radius:20px 20px 0 0;
     padding:16px 18px calc(18px + env(safe-area-inset-bottom)); backdrop-filter:blur(10px);
     box-shadow:0 -6px 20px rgba(0,0,0,.35);
-    height:52vh; max-height:52vh; overflow-y:auto; -webkit-overflow-scrolling:touch;
+    max-height:70vh; overflow-y:auto; -webkit-overflow-scrolling:touch;
     transform:translateY(120%); opacity:0; pointer-events:none;
     transition:transform .32s cubic-bezier(.22,.9,.3,1), opacity .28s ease, height .28s cubic-bezier(.22,.9,.3,1);
   }
@@ -34287,13 +34287,15 @@ function irALote(id, updateUrl){
   }
 }
 
-// Arrastre del card: se puede reducir a la mitad (para ver el mapa detras)
-// sin cerrarlo del todo, arrastrando desde la agarradera.
+// Arrastre del card: se puede reducir (para ver el mapa detras) sin
+// cerrarlo del todo, arrastrando desde la agarradera. La altura "completa"
+// se toma del contenido real de cada card, no de un numero fijo.
 (function(){
   const sheet = document.getElementById('sheet');
   const handle = sheet.querySelector('.handle');
-  const EXPANDIDA = 52, COLAPSADA = 28, CIERRE = 14; // en vh
-  let startY = 0, startHeightVh = EXPANDIDA, arrastrando = false, huboMovimiento = false;
+  const TOPE = 70, CIERRE = 14; // vh: tope maximo y umbral de cierre
+  let alturaCompleta = TOPE;
+  let startY = 0, startHeightVh = TOPE, arrastrando = false, huboMovimiento = false;
 
   function vh(px){ return (px / window.innerHeight) * 100; }
 
@@ -34310,7 +34312,7 @@ function irALote(id, updateUrl){
     const deltaY = startY - e.touches[0].clientY;
     if(Math.abs(deltaY) > 6) huboMovimiento = true;
     let nueva = startHeightVh + vh(deltaY);
-    nueva = Math.max(CIERRE, Math.min(EXPANDIDA, nueva));
+    nueva = Math.max(CIERRE, Math.min(alturaCompleta, nueva));
     sheet.style.height = nueva + 'vh';
   }, {passive:false});
 
@@ -34324,21 +34326,27 @@ function irALote(id, updateUrl){
       cerrarSheet();
       return;
     }
-    if(alturaActual < (COLAPSADA + CIERRE)/2){
+    const colapsada = alturaCompleta / 2;
+    if(alturaActual < (colapsada + CIERRE)/2){
       cerrarSheet();
-    } else if(alturaActual < (EXPANDIDA + COLAPSADA)/2){
-      sheet.style.height = COLAPSADA + 'vh';
+    } else if(alturaActual < (alturaCompleta + colapsada)/2){
+      sheet.style.height = colapsada + 'vh';
     } else {
-      sheet.style.height = EXPANDIDA + 'vh';
+      sheet.style.height = alturaCompleta + 'vh';
     }
     // evita que el toque de arrastre tambien dispare el cierre por click
     sheet.dataset.recienArrastrado = '1';
     setTimeout(()=>{ delete sheet.dataset.recienArrastrado; }, 350);
   });
 
-  // cada vez que se abre un card nuevo, vuelve a su altura expandida
+  // cada vez que se abre un card nuevo: se deja que el contenido defina
+  // su propia altura (CSS auto + max-height), y se mide esa altura real
+  // para usarla como referencia del arrastre.
   window.resetAlturaSheet = function(){
-    sheet.style.height = EXPANDIDA + 'vh';
+    sheet.style.height = '';
+    requestAnimationFrame(()=>{
+      alturaCompleta = Math.min(TOPE, vh(sheet.getBoundingClientRect().height));
+    });
   };
 })();
 
@@ -34388,13 +34396,16 @@ input.addEventListener('keydown', (e)=>{
   }
 });
 
+function msjPodas(nombre){
+  return encodeURIComponent('Hola '+nombre+', soy del barrio La Eugenia y necesito hacerle una consulta.');
+}
 const contactosPodasHTML = `
   <p>Las podas de mediano y gran porte deberán ser retiradas por cada propietario, ya que este servicio no forma parte de las tareas habituales y comprometidas por el Club.</p>
   <p>A modo meramente colaborativo, compartimos algunos contactos de prestadores que realizan este tipo de trabajos:</p>
   <div class="contactos">
-    <a class="contacto-btn" href="https://wa.me/5493765121797" target="_blank" rel="noopener"><span>Sr. Félix</span><span class="ir">WhatsApp 📲</span></a>
-    <a class="contacto-btn" href="https://wa.me/5493764726485" target="_blank" rel="noopener"><span>Sr. Patiño</span><span class="ir">WhatsApp 📲</span></a>
-    <a class="contacto-btn" href="https://wa.me/5493764889851" target="_blank" rel="noopener"><span>Sr. Aquino</span><span class="ir">WhatsApp 📲</span></a>
+    <a class="contacto-btn" href="https://wa.me/5493765121797?text=${msjPodas('Sr. Félix')}" target="_blank" rel="noopener"><span>Sr. Félix</span><span class="ir">WhatsApp 📲</span></a>
+    <a class="contacto-btn" href="https://wa.me/5493764726485?text=${msjPodas('Sr. Patiño')}" target="_blank" rel="noopener"><span>Sr. Patiño</span><span class="ir">WhatsApp 📲</span></a>
+    <a class="contacto-btn" href="https://wa.me/5493764889851?text=${msjPodas('Sr. Aquino')}" target="_blank" rel="noopener"><span>Sr. Aquino</span><span class="ir">WhatsApp 📲</span></a>
   </div>
 `;
 function mostrarPodas(){
