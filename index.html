@@ -90,7 +90,7 @@
     background:rgba(245,243,236,.97); color:var(--petroleo); border-radius:20px 20px 0 0;
     padding:14px 18px calc(16px + env(safe-area-inset-bottom));
     box-shadow:0 -6px 20px rgba(0,0,0,.35); backdrop-filter:blur(6px);
-    max-height:70vh; overflow-y:auto;
+    max-height:52vh; overflow-y:auto; -webkit-overflow-scrolling:touch;
     transform:translateY(100%); opacity:0; pointer-events:none;
     transition:transform .32s cubic-bezier(.22,.9,.3,1), opacity .28s ease;
   }
@@ -106,7 +106,7 @@
   .sheet li{font-size:12.5px; line-height:1.55; margin-bottom:4px; color:#243b3c;}
   .sheet hr{border:none; border-top:1px solid #e2ddd0; margin:14px 0;}
   .btn-podas-inline{
-    display:block; width:100%; background:var(--lima); color:var(--petroleo); border:none;
+    display:block; width:100%; color:var(--petroleo); border:none;
     border-radius:12px; padding:12px; font-size:13px; font-weight:700; margin-top:10px; cursor:pointer;
   }
   .contactos{display:flex; flex-direction:column; gap:6px; margin-top:6px;}
@@ -34092,7 +34092,7 @@ function limpiarLoteSeleccionado(){
   }
 }
 
-const infoZonaHTML = () => `
+const infoZonaHTML = (zona) => `
   <p>En esta zona, el mantenimiento habitual se realiza con una frecuencia mensual y habitualmente comprende:</p>
   <ul>
     <li>Recolección de residuos verdes depositados en ponchadas.</li>
@@ -34101,8 +34101,15 @@ const infoZonaHTML = () => `
   <p class="nota">Nota: Las fechas de corte y recolección se informan previamente a través de <i>La Euge Informa</i> 📣 (en WhatsApp), de acuerdo con el cronograma establecido para cada zona por el área de Intendencia.</p>
   <hr>
   <p><b>¿Necesitás retirar podas medianas o grandes?</b><br>Conocé cómo gestionar este servicio de forma particular.</p>
-  <button class="btn-podas-inline" id="btnGrandesPodasInline">Grandes Podas</button>
+  <button class="btn-podas-inline" id="btnGrandesPodasInline" style="background:var(--zona${zona})">Grandes Podas</button>
 `;
+
+// Sube el mapa a la vista para que quede una franja tocable por encima del card
+function subirMapaALaVista(){
+  const host = document.getElementById('mapHost');
+  const y = host.getBoundingClientRect().top + window.scrollY - 10;
+  window.scrollTo({top: Math.max(y,0), behavior:'smooth'});
+}
 
 function mostrarSheetZona(zona, loteId){
   const titulo = loteId
@@ -34110,8 +34117,9 @@ function mostrarSheetZona(zona, loteId){
     : ZONA_NOMBRE[zona];
   document.getElementById('sheetTitulo').textContent = titulo;
   document.getElementById('sheetSwatch').style.background = 'var(--zona'+zona+')';
-  document.getElementById('sheetBody').innerHTML = infoZonaHTML();
+  document.getElementById('sheetBody').innerHTML = infoZonaHTML(zona);
   document.getElementById('sheet').classList.add('show');
+  subirMapaALaVista();
   document.getElementById('btnGrandesPodasInline').addEventListener('click', (e)=>{
     e.stopPropagation();
     mostrarPodas();
@@ -34239,6 +34247,7 @@ function mostrarPodas(){
   document.getElementById('sheetSwatch').style.background = 'var(--naranja)';
   document.getElementById('sheetBody').innerHTML = contactosPodasHTML;
   document.getElementById('sheet').classList.add('show');
+  subirMapaALaVista();
 }
 document.getElementById('btnPodasGrandes').addEventListener('click', mostrarPodas);
 
