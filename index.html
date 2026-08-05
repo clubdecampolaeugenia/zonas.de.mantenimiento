@@ -43,10 +43,11 @@
   .top-row{ display:flex; align-items:flex-start; gap:10px; padding:12px 14px 0; position:relative; z-index:70; }
   .destinos-wrap{ position:relative; flex-shrink:0; }
   .pin-btn{
-    width:50px; height:50px; border-radius:50%; border:1px solid rgba(255,255,255,.5);
-    background:rgba(255,255,255,.4);
-    color:var(--petroleo); font-size:20px; box-shadow:0 3px 10px rgba(0,0,0,.25), inset 0 1px 1px rgba(255,255,255,.6);
-    opacity:.88; transform:scale(1); transition:opacity .2s ease, background .25s ease, transform .25s cubic-bezier(.34,1.56,.64,1);
+    width:50px; height:50px; border-radius:50%; border:1px solid rgba(255,255,255,.65);
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E"); background-color:rgba(255,255,255,.32); background-blend-mode:overlay;
+    color:var(--petroleo); font-size:20px; box-shadow:0 0 0 1px rgba(9,26,26,.14), 0 2px 6px rgba(0,0,0,.18), 0 8px 22px rgba(0,0,0,.18), inset 0 1px 1px rgba(255,255,255,.7);
+    backdrop-filter:blur(28px) saturate(180%); -webkit-backdrop-filter:blur(28px) saturate(180%);
+    opacity:.88; transform:scale(1); transition:opacity .12s ease, background .25s ease, transform .25s cubic-bezier(.34,1.56,.64,1), box-shadow .38s cubic-bezier(.4,0,.2,1);
     display:flex; align-items:center; justify-content:center; padding:0; cursor:pointer; position:relative;
   }
   .pin-btn:active, .pin-btn.open{ opacity:1; background:#fff; transform:scale(1.08); }
@@ -88,7 +89,7 @@
   .legend button .letras{ font-weight:400; font-size:10px; opacity:.8; }
 
   .search-wrap{ margin:0; flex:1; min-width:0; }
-  .search-box{display:flex; align-items:center; gap:8px; background:rgba(255,255,255,.4); border:1px solid rgba(255,255,255,.5); border-radius:16px; height:50px; padding:0 16px; box-sizing:border-box; box-shadow:0 4px 14px rgba(0,0,0,.25), inset 0 1px 1px rgba(255,255,255,.6); transition:background .25s ease, transform .25s cubic-bezier(.34,1.56,.64,1);}
+  .search-box{display:flex; align-items:center; gap:8px; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E"); background-color:rgba(255,255,255,.32); background-blend-mode:overlay; border:1px solid rgba(255,255,255,.5); border-radius:16px; height:50px; padding:0 16px; box-sizing:border-box; backdrop-filter:blur(28px) saturate(180%); -webkit-backdrop-filter:blur(28px) saturate(180%); box-shadow:0 2px 6px rgba(0,0,0,.18), 0 10px 26px rgba(0,0,0,.16), inset 0 1px 1px rgba(255,255,255,.7); transition:background .25s ease, transform .25s cubic-bezier(.34,1.56,.64,1), opacity .38s cubic-bezier(.4,0,.2,1);}
   .search-box svg{ stroke:#fff; flex-shrink:0; transition:stroke .25s ease; }
   .search-box input{border:none; outline:none; flex:1; font-size:16px; color:#fff; background:transparent; transition:color .25s ease;}
   .search-box input::placeholder{ color:rgba(255,255,255,.85); }
@@ -121,7 +122,7 @@
     background:var(--petroleo); color:var(--hueso); font-size:22px; font-weight:700;
     display:flex; align-items:center; justify-content:center; padding:0; line-height:1;
     box-shadow:0 3px 10px rgba(0,0,0,.3); cursor:pointer;
-    transition:background .2s ease, transform .18s cubic-bezier(.34,1.56,.64,1);
+    transition:background .2s ease, transform .18s cubic-bezier(.34,1.56,.64,1), opacity .38s cubic-bezier(.4,0,.2,1);
   }
   .map-zoom-controls button:active{ transform:scale(.92); background:#0d4143; }
   .map-zoom-controls button.pildora-calles{
@@ -129,6 +130,12 @@
     padding:0 18px;
   }
   .map-zoom-controls button.pildora-calles.active{ background:var(--hueso); color:var(--petroleo); }
+
+  /* ---- interfaz dinámica: el buscador, el logo y los controles se
+         atenúan mientras se mueve el mapa, vuelven al quedar quieto ---- */
+  body.mapa-interacting .search-box,
+  body.mapa-interacting .pin-btn,
+  body.mapa-interacting .map-zoom-controls button{ opacity:.28; }
 
   @keyframes pulseZona1{ 0%,100%{ fill:#00A650; } 50%{ fill:var(--zona1); } }
   @keyframes pulseZona2{ 0%,100%{ fill:#00A650; } 50%{ fill:var(--zona2); } }
@@ -158,6 +165,16 @@
     transition:transform .32s cubic-bezier(.22,.9,.3,1), opacity .28s ease, height .28s cubic-bezier(.22,.9,.3,1);
   }
   .sheet.dragging{ transition:opacity .28s ease; }
+
+  /* ---- en pantallas grandes, todo se centra en una columna de 520px,
+         igual que Cómo Llegar, en vez de estirarse de punta a punta ---- */
+  @media (min-width: 560px){
+    .legend{ max-width:520px; margin-left:auto; margin-right:auto; }
+    .top-row{ max-width:520px; margin-left:auto; margin-right:auto; box-sizing:border-box; }
+    #mapHost{ max-width:520px; margin-left:auto; margin-right:auto; }
+    .map-zoom-controls{ max-width:520px; margin-left:auto; margin-right:auto; }
+    .sheet{ left:50%; right:auto; width:calc(100% - 28px); max-width:520px; margin-left:-260px; }
+  }
   .sheet.show{ transform:translateY(0); opacity:1; pointer-events:auto; }
   .sheet .handle-zone{width:100%; height:32px; display:flex; align-items:center; justify-content:center; touch-action:none; margin:-4px 0 4px;}
   .sheet .handle{width:40px; height:4px; background:rgba(19,84,87,.5); border-radius:4px;}
@@ -34136,7 +34153,19 @@ AAAAAAAAAAAAAAAAAAAAAAAAgEj/BEfDIS5Jha1kAAAAAElFTkSuQmCC" transform="matrix(6.86
   let panStartX = 0, panStartY = 0, panStartVb = null, panning = false;
   const MIN_SCALE = 1, MAX_SCALE = 4;
 
+  // Esmerilado dinámico: la interfaz se retira mientras el mapa se mueve
+  // (paneo o pellizco), y vuelve a su opacidad normal al quedar quieto.
+  let mapaInteractTimer = null;
+  function marcarMapaInteractuando(){
+    document.body.classList.add('mapa-interacting');
+    clearTimeout(mapaInteractTimer);
+    mapaInteractTimer = setTimeout(()=>{
+      document.body.classList.remove('mapa-interacting');
+    }, 300);
+  }
+
   function aplicar(){
+    marcarMapaInteractuando();
     svgEl.setAttribute('viewBox', vb.x+' '+vb.y+' '+vb.w+' '+vb.h);
   }
 
@@ -34160,6 +34189,7 @@ AAAAAAAAAAAAAAAAAAAAAAAAgEj/BEfDIS5Jha1kAAAAAElFTkSuQmCC" transform="matrix(6.86
   }
 
   host.addEventListener('touchstart', (e)=>{
+    marcarMapaInteractuando();
     if(e.touches.length === 2){
       pinchStartDist = distancia(e.touches[0], e.touches[1]);
       pinchStartVb = {x:vb.x, y:vb.y, w:vb.w, h:vb.h};
