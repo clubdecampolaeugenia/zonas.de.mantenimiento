@@ -34316,6 +34316,13 @@ AAAAAAAAAAAAAAAAAAAAAAAAgEj/BEfDIS5Jha1kAAAAAElFTkSuQmCC" transform="matrix(6.86
       animarViewBoxHacia(destino, 550);
     });
   };
+
+  // Vuelve el mapa a su vista completa (sin zoom), animado igual que el
+  // centrado en un lote. Se usa al cerrar el card, para no dejar al
+  // usuario con el zoom-in aplicado sin ninguna ficha abierta.
+  window.volverAVistaCompleta = function(){
+    animarViewBoxHacia({x:BASE.x, y:BASE.y, w:BASE.w, h:BASE.h}, 500);
+  };
 })();
 
 // Bloquea el pellizco de zoom en el resto de la pagina (el mapa tiene el suyo propio)
@@ -34517,6 +34524,7 @@ function cerrarSheet(){
   document.querySelector('.titulo-wrap').classList.remove('oculto');
   volverASolido();
   limpiarLoteSeleccionado();
+  if(window.volverAVistaCompleta) window.volverAVistaCompleta();
   const url = new URL(location.href);
   url.searchParams.delete('zona'); url.searchParams.delete('lote');
   history.replaceState(null,'',url);
