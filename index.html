@@ -34259,6 +34259,63 @@ AAAAAAAAAAAAAAAAAAAAAAAAgEj/BEfDIS5Jha1kAAAAAElFTkSuQmCC" transform="matrix(6.86
   }
   document.getElementById('btnZoomIn').addEventListener('click', ()=> zoomStep(1.4));
   document.getElementById('btnZoomOut').addEventListener('click', ()=> zoomStep(1/1.4));
+
+  // Anima el viewBox actual hacia uno destino, en pasos suaves (ease-out).
+  function animarViewBoxHacia(destino, duracion){
+    const inicio = {x:vb.x, y:vb.y, w:vb.w, h:vb.h};
+    const t0 = performance.now();
+    function paso(ahora){
+      marcarMapaInteractuando();
+      const p = Math.min(1, (ahora - t0) / duracion);
+      const ease = 1 - Math.pow(1 - p, 3);
+      vb.x = inicio.x + (destino.x - inicio.x) * ease;
+      vb.y = inicio.y + (destino.y - inicio.y) * ease;
+      vb.w = inicio.w + (destino.w - inicio.w) * ease;
+      vb.h = inicio.h + (destino.h - inicio.h) * ease;
+      aplicar();
+      if(p < 1) requestAnimationFrame(paso);
+    }
+    requestAnimationFrame(paso);
+  }
+
+  // Centra el mapa en un lote reservando espacio para el card que se abre
+  // debajo, para que en pantallas grandes (donde el card puede tapar buena
+  // parte del mapa) el lote buscado nunca quede escondido detras suyo.
+  window.centrarEnLote = function(el){
+    if(!el || !el.getBBox) return;
+    const bbox = el.getBBox();
+    const ctm = el.getCTM();
+    if(!ctm) return;
+    const pt = svgEl.createSVGPoint();
+    pt.x = bbox.x + bbox.width/2;
+    pt.y = bbox.y + bbox.height/2;
+    const centro = pt.matrixTransform(ctm);
+
+    requestAnimationFrame(()=>{
+      const sheetEl = document.getElementById('sheet');
+      const rectHost = host.getBoundingClientRect();
+      const alturaCardPx = sheetEl.classList.contains('show') ? sheetEl.getBoundingClientRect().height : 0;
+      const reservaFrac = Math.min(0.62, (alturaCardPx + 16) / rectHost.height);
+      const yFrac = (1 - reservaFrac) / 2;
+
+      const targetScale = Math.min(MAX_SCALE, 2.3);
+      const nuevoW = BASE.w / targetScale;
+      const nuevoH = BASE.h / targetScale;
+
+      let destino = {
+        x: centro.x - nuevoW/2,
+        y: centro.y - nuevoH*yFrac,
+        w: nuevoW,
+        h: nuevoH
+      };
+      destino.w = Math.min(BASE.w, Math.max(BASE.w/MAX_SCALE, destino.w));
+      destino.h = Math.min(BASE.h, Math.max(BASE.h/MAX_SCALE, destino.h));
+      destino.x = Math.min(BASE.x + (BASE.w - destino.w), Math.max(BASE.x, destino.x));
+      destino.y = Math.min(BASE.y + (BASE.h - destino.h), Math.max(BASE.y, destino.y));
+
+      animarViewBoxHacia(destino, 550);
+    });
+  };
 })();
 
 // Bloquea el pellizco de zoom en el resto de la pagina (el mapa tiene el suyo propio)
@@ -34489,6 +34546,7 @@ function irALote(id, updateUrl){
   }
   document.querySelector('.legend button[data-zona="'+info.zona+'"]').classList.add('active');
   mostrarSheetZona(info.zona, id);
+  if(window.centrarEnLote) window.centrarEnLote(el);
   document.getElementById('suggestions').classList.remove('open');
   document.getElementById('searchInput').value = id;
   document.getElementById('searchInput').blur();
