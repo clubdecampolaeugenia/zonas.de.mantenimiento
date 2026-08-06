@@ -34285,12 +34285,12 @@ AAAAAAAAAAAAAAAAAAAAAAAAgEj/BEfDIS5Jha1kAAAAAElFTkSuQmCC" transform="matrix(6.86
     if(!el) return;
     requestAnimationFrame(()=>{
       const bbox = el.getBBox();
-      const ctm = el.getCTM();
-      if(!ctm) return; // el mapa todavia no termino su layout inicial; se omite sin romper nada
-      const pt = svgEl.createSVGPoint();
-      pt.x = bbox.x + bbox.width/2;
-      pt.y = bbox.y + bbox.height/2;
-      const centro = pt.matrixTransform(ctm);
+      // Las coordenadas de getBBox() ya estan en el mismo sistema que vb
+      // (unidades propias del SVG, no pixeles de pantalla) - no hace falta
+      // convertirlas con getCTM(), que da la posicion en pantalla YA con
+      // el zoom actual aplicado y causaba que el destino saliera mal
+      // calculado cuando el lote estaba lejos de la vista actual.
+      const centro = { x: bbox.x + bbox.width/2, y: bbox.y + bbox.height/2 };
 
       const sheetEl = document.getElementById('sheet');
       const rectHost = host.getBoundingClientRect();
