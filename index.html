@@ -34282,16 +34282,16 @@ AAAAAAAAAAAAAAAAAAAAAAAAgEj/BEfDIS5Jha1kAAAAAElFTkSuQmCC" transform="matrix(6.86
   // debajo, para que en pantallas grandes (donde el card puede tapar buena
   // parte del mapa) el lote buscado nunca quede escondido detras suyo.
   window.centrarEnLote = function(el){
-    if(!el || !el.getBBox) return;
-    const bbox = el.getBBox();
-    const ctm = el.getCTM();
-    if(!ctm) return;
-    const pt = svgEl.createSVGPoint();
-    pt.x = bbox.x + bbox.width/2;
-    pt.y = bbox.y + bbox.height/2;
-    const centro = pt.matrixTransform(ctm);
-
+    if(!el) return;
     requestAnimationFrame(()=>{
+      const bbox = el.getBBox();
+      const ctm = el.getCTM();
+      if(!ctm) return; // el mapa todavia no termino su layout inicial; se omite sin romper nada
+      const pt = svgEl.createSVGPoint();
+      pt.x = bbox.x + bbox.width/2;
+      pt.y = bbox.y + bbox.height/2;
+      const centro = pt.matrixTransform(ctm);
+
       const sheetEl = document.getElementById('sheet');
       const rectHost = host.getBoundingClientRect();
       const alturaCardPx = sheetEl.classList.contains('show') ? sheetEl.getBoundingClientRect().height : 0;
