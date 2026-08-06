@@ -99,8 +99,8 @@
   .search-box:focus-within svg{ stroke:var(--petroleo); }
   .search-box:focus-within input{ color:var(--petroleo); }
   .search-box:focus-within input::placeholder{ color:var(--gris); }
-  .suggestions{position:absolute; top:calc(100% + 6px); left:0; right:0; z-index:75; margin-top:0; background:#fff; border-radius:16px; box-shadow:0 10px 26px rgba(0,0,0,.3); overflow:auto; max-height:0; opacity:0; pointer-events:none; transition:max-height .25s ease, opacity .2s ease;}
-  .suggestions.open{max-height:240px; opacity:1; pointer-events:auto;}
+  .suggestions{position:absolute; top:calc(100% + 6px); left:0; right:0; z-index:75; margin-top:0; background:rgba(255,255,255,.92); backdrop-filter:blur(20px) saturate(160%); -webkit-backdrop-filter:blur(20px) saturate(160%); border-radius:16px; box-shadow:0 10px 26px rgba(0,0,0,.3); overflow:hidden; max-height:0; opacity:0; pointer-events:none; transition:max-height .25s ease, opacity .2s ease;}
+  .suggestions.open{max-height:280px; opacity:1; pointer-events:auto;}
   .suggestion-item{padding:11px 16px; font-size:14px; border-top:1px solid var(--hueso); display:flex; justify-content:space-between; align-items:center; cursor:pointer;}
   .suggestion-item:first-child{border-top:none;}
   .suggestion-item:active{background:var(--hueso);}
@@ -34657,7 +34657,7 @@ const searchIndex = Object.keys(LOTES).sort();
 input.addEventListener('input', ()=>{
   const q = input.value.trim().toUpperCase();
   if(!q){ sugBox.classList.remove('open'); sugBox.innerHTML=''; return; }
-  const matches = searchIndex.filter(id=>id.includes(q)).slice(0,20);
+  const matches = searchIndex.filter(id=>id.includes(q)).slice(0,6);
   if(!matches.length){ sugBox.classList.remove('open'); sugBox.innerHTML=''; return; }
   sugBox.innerHTML = matches.map(id=>{
     const z = LOTES[id].zona;
